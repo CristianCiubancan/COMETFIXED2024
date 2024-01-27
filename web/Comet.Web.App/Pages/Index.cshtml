@@ -1,0 +1,87 @@
+﻿@page
+@using Comet.Web.App.Services
+@inject LanguageService LanguageManager
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<!--
+Banner
+
+Additional classes:
+.small
+.xsmall
+.big
+.full
+-->
+<section class="youplay-banner banner-top youplay-banner-parallax">
+    <div class="image" data-speed="0.4">
+        <img src="~/assets/images/parallax/shaolin_1920x1200.jpg" alt="" class="jarallax-img">
+    </div>
+    <div class="info">
+        <div>
+            <div class="container">
+                <div class="text-center">
+                    <h1 class="fs-60">@LanguageManager.GetString("GameName")</h1>
+                    <a class="btn btn-md video-popup" href="https://www.youtube.com/watch?v=5CGCVdypB3c">
+                        <i class="fa fa-play-circle"></i>&nbsp;@Html.Raw(LanguageManager.GetString("WatchTrailer"))
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Preorder -->
+<section class="youplay-banner youplay-banner-parallax mt-60" id="exclusive">
+    <div class="image" data-speed="-0.2">
+        <img class="jarallax-img" src="~/assets/images/parallax/shaolin2_1920x1200.jpg" alt="">
+    </div>
+    <div class="info container align-center">
+        <div>
+            <h2>@LanguageManager.GetString("GameNameVersion")</h2>
+            <h3>@LanguageManager.GetString("ExclusiveWindowsRelease")</h3>
+            @if (DateTime.Now < new DateTime(2022, 01, 01, 01, 00, 00))
+            {
+                <!-- See countdown init in bottom of the page -->
+                <div class="countdown style-1 h2" data-end="2022-01-01 00:00" data-timezone="America/Sao_Paulo"></div>
+                <br>
+                <br>
+            }
+
+            <a class="btn btn-md" asp-area="" asp-page="/Downloads">@LanguageManager.GetString("Download")</a>
+            @if (!User.Identity.IsAuthenticated)
+            {
+                <a class="btn btn-md" asp-page="Register">@LanguageManager.GetString("Register")</a>
+            }
+            else
+            {
+                <a class="btn btn-md" asp-area="Panel" asp-page="/User/Accounts">@LanguageManager.GetString("Register")</a>
+            }
+        </div>
+    </div>
+</section>
+<!-- /Preorder -->
+<!-- Latest News -->
+<h2 class="container h1">@LanguageManager.GetString("LatestNews")</h2>
+<section class="youplay-news container">
+
+    <a asp-area="News" asp-page="Index" class="btn read-more pull-left">@LanguageManager.GetString("MoreNews")</a>
+</section>
+<!-- /Latest News -->
+
+@section Scripts
+{
+    <script>
+        $(".countdown").each(function() {
+            let tz = $(this).attr('data-timezone');
+            let end = $(this).attr('data-end');
+            end = moment.tz(end, tz).toDate();
+            $(this).countdown(end,
+                function(event) {
+                    $(this).text(event.strftime('%D @LanguageManager.GetString("Days") %H:%M:%S'));
+                });
+        });
+    </script>
+}

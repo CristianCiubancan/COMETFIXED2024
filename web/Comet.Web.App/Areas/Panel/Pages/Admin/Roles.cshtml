@@ -1,0 +1,82 @@
+﻿@page
+@using Comet.Web.App.Services
+@inject LanguageService Language;
+@model Comet.Web.App.Areas.Panel.Pages.Admin.RolesModel
+@{
+    ViewData["title"] = Language.GetString("RoleManagement");
+}
+
+@await Html.PartialAsync("../../../Pages/Shared/_ViewTitleContainer")
+
+<div class="container youplay-news">
+    <div class="col table-responsive">
+        <table id="tblRoleManagement" class="table table-striped">
+            <thead>
+                <tr>
+                    <td>#</td>
+                    <td>@Language.GetString("RoleName")</td>
+                    <td>@Language.GetString("RoleNormalizedName")</td>
+                    <td>@Language.GetString("MemberAmount")</td>
+                    <td>@Language.GetString("CreationDate")</td>
+                    <td>@Language.GetString("ModifiedDate")</td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts
+{
+<script>
+
+    $(document).ready(function() {
+
+        $.ajax({
+            url: '@Url.Action("Get", "Roles")',
+            method: 'GET',
+            success: function(result) {
+
+                let table = document.getElementById('tblRoleManagement');
+                let body = table.tBodies[0];
+
+                $(body).empty();
+
+                if (result.length) {
+                    for (let idx = 0; idx < result.length; idx++)
+                    {
+                        let row = body.insertRow();
+                        row.insertCell().innerHTML = result[idx].id;
+                        row.insertCell().innerHTML = result[idx].name;
+                        row.insertCell().innerHTML = result[idx].normalizedName;
+                        row.insertCell().innerHTML = result[idx].count;
+                        let date = new Date(result[idx].creationDate);
+                        row.insertCell().innerHTML = date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR');
+                        if (result[idx].modifiedDate) {
+                            date = new Date(result[idx].modifiedDate);
+                            row.insertCell().innerHTML = date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR');
+                        }
+                        else {
+                            row.insertCell().innerHTML = '@Language.GetString("Never")';
+                        }
+                        row.insertCell().innerHTML = `<a href="/Panel/Admin/Role/${result[idx].id}"><i class="fa fa-edit" title="Editar"></i></a>`;
+                    }
+                }
+                else {
+                    let cell = body.insertRow().insertCell();
+                    cell.colSpan = 6;
+                    cell.innerHTML = '@Language.GetString("NoData")';
+                }
+
+            },
+            error: function (result) {
+
+            }
+        });
+
+    });
+
+</script>
+}

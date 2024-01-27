@@ -1,0 +1,13 @@
+﻿@page
+@using Comet.Web.App.Services
+@inject LanguageService Language
+@model ConfirmEmailModel
+@{
+    ViewData["Title"] = Language.GetString("ConfirmEmail");
+}
+
+@await Html.PartialAsync("../../../Pages/Shared/_ViewTitleContainer")
+
+<div class="container youplay-news">
+    <partial name="_StatusMessage" model="Model.StatusMessage" />
+</div>

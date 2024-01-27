@@ -1,0 +1,8 @@
+/* PLACE YOUR CUSTOM STYLES IN THIS FILE */
+.validation-summary-errors ul {
+    padding-left: 15px;
+}
+
+.validation-summary-errors li {
+    list-style: none;
+}

@@ -1,0 +1,26 @@
+﻿@page
+@using Comet.Web.App.Services
+@inject LanguageService Language
+@model LockoutModel
+@{
+    ViewData["Title"] = Language.GetString("LockedOut");
+}
+
+<section class="youplay-banner banner-top youplay-banner-parallax full">
+    <div class="image" data-speed="0.4">
+        <img src="~/assets/images/parallax/shaolin2_1920x1200.jpg" alt="" class="jarallax-img">
+    </div>
+    <div class="info">
+        <div>
+            <div class="container">
+                <div class="youplay-login">
+                    <div class="youplay-form text-center">
+                        <h3>@ViewData["Title"]</h3>
+                        <hr />
+                        @Html.Raw(Language.GetString("LockoutMessage"))
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

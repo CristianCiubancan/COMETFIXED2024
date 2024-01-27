@@ -1,0 +1,22 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////&#xD;
+Copyright (C) FTW! Masters&#xD;
+Keep the headers and the patterns adopted by the project. If you changed anything in the file just insert&#xD;
+your name below, but don't remove the names of who worked here before.&#xD;
+&#xD;
+This project is a fork from Comet, a Conquer Online Server Emulator created by Spirited, which can be
+found here: https://gitlab.com/spirited/comet&#xD;
+&#xD;
+$SOLUTION$ - $PROJECT$ - $FILENAME$&#xD;
+Description: &#xD;
+&#xD;
+Creator: $USER_LOGIN$ [$USER_NAME$]&#xD;
+&#xD;
+Developed by: &#xD;
+Felipe Vieira Vendramini &lt;felipevendramini@live.com&gt;&#xD;
+&#xD;
+Programming today is a race between software engineers striving to build bigger and better&#xD;
+idiot-proof programs, and the Universe trying to produce bigger and better idiots. &#xD;
+So far, the Universe is winning.&#xD;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Arenic/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

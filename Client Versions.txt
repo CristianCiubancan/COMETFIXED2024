@@ -1,0 +1,91 @@
+5006
+- Offline TG
+- High Definition and Standard Mode
+
+5016
+- New Fonts
+- Nobility Rank
+- Auto Path
+- Team Auto Invite
+- Mines NPC
+- Celestial Stone in Shopping Mall
+
+5022
+- Mentor and Apprentice System
+- Suspicious Items
+- Trade Partner
+- Item Lock
+- Merchant Account
+- *** Anti virus ***
+
+5022
+- Super Guild War (and probably GoldPrize, etc)
+
+5035
+- New equipment (Plumes and etc)
+- 120 Shield and Headgear
+
+5066
+- Detain Equipment
+- Composition System
+- Earrings wont display as flowers
+- Armor colors wont bug
+- GoodLuck Garment wont bug hairstyles no more
+
+5072
+- Heaven Fan and Star Tower
+- Flowers
+- VIP System
+
+5078
+- Honor Halo
+- Flowers Ranking
+
+5087
+- Ninjas
+
+5095
+- Ninjas fixed :]
+
+5103
+- Quiz Show
+
+5103-5187
+- Enlightenment
+- Arena Qualifier
+- Steeds
+- Guild Arsenal System
+- Family
+
+5198
+- Alternative Equipment
+- Texas Hold'em
+
+5205
+- Equipment Degrade
+
+5212
+- First and Last Name
+- Arena Honor Store
+- Refinery System
+- Horse Racing
+- Socketing Interface
+
+5250
+- Sub class system
+- Artifact System
+- Weapon Accessories
+- 3-6 floor grotto
+- Ninja full super effect (finally)
+- Expanded Warehouses
+- The mark of inscribed becomes invisible when players are checking other players' equipment
+- The Last Name section has been removed from the new character creation process
+
+5286
+- Guild Contest and Guild PK
+- Elite PK Tournament
+- Clan Qualifier
+- Reincarnation
+
+5310
+- Back to Login from game (finally)
