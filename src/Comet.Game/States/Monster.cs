@@ -345,7 +345,7 @@ namespace Comet.Game.States
                 }
             }
             // TODO: add an env variable to adjust drop for dbs in particular
-            int multiplier = 100;
+            int multiplier = 500;
             if (await Kernel.ChanceCalcAsync(50, 16500))
             {
                 uint cpsBagType = (uint)await Kernel.NextAsync(729910, 729912);
