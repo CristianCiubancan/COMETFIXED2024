@@ -182,8 +182,8 @@ namespace Comet.Game
 
         public static async Task<bool> ChanceCalcAsync(int chance, int outOf)
         {
-            // TODO: add an env variable for this
-            int multiplier = 10;
+            // TODO: add an env variable for this bad idea this is used for more than the drop
+            int multiplier = 1;
             int adjustedChance = chance * multiplier;
 
             // Ensure that the adjusted chance does not exceed 'outOf'
