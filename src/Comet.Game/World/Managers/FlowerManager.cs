@@ -51,7 +51,7 @@ namespace Comet.Game.World.Managers
 
         public static async Task<List<FlowerRankingStruct>> GetFlowerRankingAsync(MsgFlower.FlowerType type, int from = 0, int limit = 10)
         {
-            DataTable query = await BaseRepository.SelectAsync($"CALL QueryFlowerRanking({(int)type},{limit},{from})");
+            // DataTable query = await BaseRepository.SelectAsync($"CALL QueryFlowerRanking({(int)type},{limit},{from})");
             List<FlowerRankingStruct> result = new List<FlowerRankingStruct>();
             // TODO: implement flower ranking
             // foreach (DataRow row in query.Rows)
