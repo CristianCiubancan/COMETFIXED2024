@@ -53,35 +53,35 @@ namespace Comet.Game.World.Managers
         {
             DataTable query = await BaseRepository.SelectAsync($"CALL QueryFlowerRanking({(int)type},{limit},{from})");
             List<FlowerRankingStruct> result = new List<FlowerRankingStruct>();
+            // TODO: implement flower ranking
+            // foreach (DataRow row in query.Rows)
+            // {
+            //     var item = new FlowerRankingStruct
+            //     {
+            //         Identity = uint.Parse(row["id"]?.ToString() ?? "0"),
+            //         Name = row["name"].ToString(),
+            //         Profession = ushort.Parse(row["profession"]?.ToString() ?? "0"),
+            //         Position = int.Parse(row["rank"]?.ToString() ?? "0")
+            //     };
 
-            foreach (DataRow row in query.Rows)
-            {
-                var item = new FlowerRankingStruct
-                {
-                    Identity = uint.Parse(row["id"]?.ToString() ?? "0"),
-                    Name = row["name"].ToString(),
-                    Profession = ushort.Parse(row["profession"]?.ToString() ?? "0"),
-                    Position = int.Parse(row["rank"]?.ToString() ?? "0")
-                };
+            //     switch (type)
+            //     {
+            //         case MsgFlower.FlowerType.RedRose:
+            //             item.Value = uint.Parse(row["rose"]?.ToString() ?? "0");
+            //             break;
+            //         case MsgFlower.FlowerType.WhiteRose:
+            //             item.Value = uint.Parse(row["lily"]?.ToString() ?? "0");
+            //             break;
+            //         case MsgFlower.FlowerType.Orchid:
+            //             item.Value = uint.Parse(row["orchid"]?.ToString() ?? "0");
+            //             break;
+            //         case MsgFlower.FlowerType.Tulip:
+            //             item.Value = uint.Parse(row["tulip"]?.ToString() ?? "0");
+            //             break;
+            //     }
 
-                switch (type)
-                {
-                    case MsgFlower.FlowerType.RedRose:
-                        item.Value = uint.Parse(row["rose"]?.ToString() ?? "0");
-                        break;
-                    case MsgFlower.FlowerType.WhiteRose:
-                        item.Value = uint.Parse(row["lily"]?.ToString() ?? "0");
-                        break;
-                    case MsgFlower.FlowerType.Orchid:
-                        item.Value = uint.Parse(row["orchid"]?.ToString() ?? "0");
-                        break;
-                    case MsgFlower.FlowerType.Tulip:
-                        item.Value = uint.Parse(row["tulip"]?.ToString() ?? "0");
-                        break;
-                }
-
-                result.Add(item);
-            }
+            //     result.Add(item);
+            // }
 
             return result;
         }

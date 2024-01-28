@@ -1363,7 +1363,14 @@ namespace Comet.Game.States
             MapItem mapItem = new MapItem((uint)IdentityGenerator.MapItem.GetNextIdentity);
             if (mapItem.Create(map, new Point(x, y), idItemtype, 0, 0, 0, 0))
             {
-                await mapItem.EnterMapAsync();
+                if (user != null && user.Map.Partition == map.Partition)
+                {
+                    await mapItem.EnterMapAsync();
+                }
+                else
+                {
+                    Kernel.Services.Processor.Queue(map.Partition, () => mapItem.EnterMapAsync());
+                }
             }
             else
             {
@@ -1630,7 +1637,15 @@ namespace Comet.Game.States
                     continue;
 
                 mapItem.SetAliveTimeout(duration);
-                await mapItem.EnterMapAsync();
+                // await mapItem.EnterMapAsync();
+                if (user?.Map != null && user.Map.Partition == map.Partition)
+                {
+                    await mapItem.EnterMapAsync();
+                }
+                else
+                {
+                    Kernel.Services.Processor.Queue(map.Partition, () => mapItem.EnterMapAsync());
+                }
             }
 
             return true;
@@ -6325,7 +6340,15 @@ namespace Comet.Game.States
             if (!await dynaNpc.InitializeAsync())
                 return false;
 
-            await dynaNpc.EnterMapAsync();
+            Task gameActionCreateNpcTask() => dynaNpc.EnterMapAsync();
+            if (user != null && map.Partition == user.Map.Partition) // if there is an actor, then the action is already queued! (EXPECTED)
+            {
+                await gameActionCreateNpcTask();
+            }
+            else
+            {
+                Kernel.Services.Processor.Queue(map.Partition, gameActionCreateNpcTask);
+            }
             return true;
         }
 

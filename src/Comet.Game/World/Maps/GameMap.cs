@@ -205,8 +205,15 @@ namespace Comet.Game.World.Maps
 
             m_regions = await DbRegion.GetAsync(Identity);
 
-            Partition = (int) Kernel.Services.Processor.SelectPartition();
-            return true;
+            if (IsSynMap() || IsFamilyMap() || IsPkField())
+            {
+                Partition = ServerProcessor.PVP_MAP_GROUP;
+                Kernel.Services.Processor.SelectPartition((uint)Partition);
+            }
+            else
+            {
+                Partition = (int)Kernel.Services.Processor.SelectPartition();
+            }            return true;
         }
 
         public async Task LoadTrapsAsync()

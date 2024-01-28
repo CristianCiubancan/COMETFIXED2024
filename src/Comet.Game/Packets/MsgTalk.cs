@@ -874,8 +874,11 @@ namespace Comet.Game.Packets
                             catch (Exception ex)
                             {
                                 await Log.WriteLogAsync("kickout_ex", LogLevel.Exception, ex.ToString());
-                                Kernel.RoleManager.ForceLogoutUser(findTarget.Identity);
-                            }
+                                Kernel.Services.Processor.Queue(ServerProcessor.NO_MAP_GROUP, () =>
+                                {
+                                    Kernel.RoleManager.ForceLogoutUser(findTarget.Identity);
+                                    return Task.CompletedTask;
+                                });                               }
 
                             return true;
                         }

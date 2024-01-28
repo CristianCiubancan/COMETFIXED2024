@@ -900,7 +900,7 @@ namespace Comet.Game.States.BaseEntities
             if (Map == null)
                 return;
 
-            Kernel.Services.Processor.Queue(Map.Partition, task);
+            Kernel.Services.Processor.Queue(Map != null ? Map.Partition : 0, task);
         }
 
         #endregion

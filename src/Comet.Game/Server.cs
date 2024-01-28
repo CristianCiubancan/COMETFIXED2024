@@ -28,6 +28,7 @@ using System.Threading.Tasks;
 using Comet.Game.Database;
 using Comet.Game.Packets;
 using Comet.Game.States;
+using Comet.Game.World;
 using Comet.Network.Packets;
 using Comet.Network.Security;
 using Comet.Network.Sockets;
@@ -395,7 +396,22 @@ namespace Comet.Game
                     }
                     Kernel.Services.Processor.Queue(actor.Character.Map.Partition, () => msg.ProcessAsync(actor));
                 }
-                else await msg.ProcessAsync(actor);
+                else
+                {
+                    // we will not send all packets to NO_MAP_GROUP
+                    // after this point we are only letting 1052 and first 10010 packet
+                    if (type == PacketType.MsgConnect 
+                        || type == PacketType.MsgRegister 
+                        || type == PacketType.MsgRank
+                        || (msg is MsgAction action && action.Action != MsgAction.ActionType.MapJump))
+                    {
+                        Kernel.Services.Processor.Queue(ServerProcessor.NO_MAP_GROUP, () => msg.ProcessAsync(actor));
+                    }
+                    else
+                    {
+                        // TODO: Add code here to handle remaining packets
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -431,7 +447,7 @@ namespace Comet.Game
                 Log.WriteLogAsync(LogLevel.Info, $"{actor.Character.Name} has logged out.").ConfigureAwait(false);
                 actor.Character.Connection = Character.ConnectionStage.Disconnected;
 
-                Kernel.Services.Processor.Queue(actor.Character.Map?.Partition ?? 0, async () =>
+                Kernel.Services.Processor.Queue(ServerProcessor.NO_MAP_GROUP, async () =>
                 {
                     Kernel.RoleManager.ForceLogoutUser(actor.Character.Identity);
                     await actor.Character.OnDisconnectAsync();

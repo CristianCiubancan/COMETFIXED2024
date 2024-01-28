@@ -38,6 +38,9 @@ namespace Comet.Game.World
 {
     public class ServerProcessor : BackgroundService
     {
+        public const int NO_MAP_GROUP = 0;
+        public const int PVP_MAP_GROUP = 1;
+        public const int NORMAL_MAP_GROUP = 2;
         protected readonly Task[] m_BackgroundTasks;
         protected readonly Channel<Func<Task>>[] m_Channels;
         protected readonly Partition[] m_Partitions;
@@ -119,12 +122,18 @@ namespace Comet.Game.World
         /// </summary>
         public uint SelectPartition()
         {
-            uint partition = m_Partitions.Aggregate((aggr, next) =>
-                next.Weight.CompareTo(aggr.Weight) < 0 ? next : aggr).ID;
+            uint partition = m_Partitions.Where(x => x.ID >= NORMAL_MAP_GROUP).Aggregate((aggr, next) =>
+                                                                            next.Weight.CompareTo(aggr.Weight) < 0
+                                                                                ? next
+                                                                                : aggr).ID;
             Interlocked.Increment(ref m_Partitions[partition].Weight);
             return partition;
         }
 
+        public void SelectPartition(uint partition)
+        {
+            Interlocked.Increment(ref m_Partitions[partition].Weight);
+        }
         /// <summary>
         ///     Deslects a partition after the client actor disconnects.
         /// </summary>

@@ -186,20 +186,24 @@ namespace Comet.Game.Packets
                     X = client.Character.MapX;
                     Y = client.Character.MapY;
 
-                    await client.Character.EnterMapAsync();
-                    await client.SendAsync(this);
+                    async Task enterMapPartitionTask()
+                    {
+                        await client.Character.EnterMapAsync();
+                        await GameAction.ExecuteActionAsync(1000000, user, null, null, "");
+                        await client.SendAsync(this);
+                        if (client.Character.VipLevel > 0)
+                            await client.Character.SendAsync(
+                                string.Format(Language.StrVipNotify, client.Character.VipLevel,
+                                    client.Character.VipExpiration.ToString("U")), MsgTalk.TalkChannel.Talk);
 
-                    await GameAction.ExecuteActionAsync(1000000, user, null, null, "");
+                        if (user.Life == 0)
+                            await user.SetAttributesAsync(ClientUpdateType.Hitpoints, 10);
 
-                    if (client.Character.VipLevel > 0)
-                        await client.Character.SendAsync(
-                            string.Format(Language.StrVipNotify, client.Character.VipLevel,
-                                client.Character.VipExpiration.ToString("U")), MsgTalk.TalkChannel.Talk);
+                        user.Connection = Character.ConnectionStage.Ready; // set user ready to be processed.
 
-                    if (user.Life == 0)
-                        await user.SetAttributesAsync(ClientUpdateType.Hitpoints, 10);
+                    }
 
-                    user.Connection = Character.ConnectionStage.Ready; // set user ready to be processed.
+                    Kernel.Services.Processor.Queue(targetMap.Partition, enterMapPartitionTask); // sends the current player from Partition 0 the proper partition
                     break;
 
                 case ActionType.LoginInventory: // 75
