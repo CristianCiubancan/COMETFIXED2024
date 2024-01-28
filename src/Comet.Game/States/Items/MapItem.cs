@@ -60,7 +60,10 @@ namespace Comet.Game.States.Items
         {
             Identity = idRole;
         }
-
+        ~MapItem()
+        {
+            IdentityGenerator.MapItem.ReturnIdentity(Identity);
+        }
         #region Creation
 
         public bool Create(GameMap map, Point pos, uint idType, uint idOwner, byte nPlus, byte nDmg,

@@ -40,6 +40,7 @@ using Comet.Game.States.Syndicates;
 using Comet.Game.World;
 using Comet.Game.World.Maps;
 using Comet.Shared;
+using IdentityModel;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -1374,6 +1375,7 @@ namespace Comet.Game.States
             }
             else
             {
+                IdentityGenerator.MapItem.ReturnIdentity(mapItem.Identity);
                 return false;
             }
 
@@ -1631,10 +1633,15 @@ namespace Comet.Game.States
                 }
 
                 if (!posSuccess)
+                {
+                    IdentityGenerator.MapItem.ReturnIdentity(mapItem.Identity);
                     continue;
-
+                }
                 if (!mapItem.Create(map, pos, idItemtype, 0, 0, 0, 0))
+                {
+                    IdentityGenerator.MapItem.ReturnIdentity(mapItem.Identity);
                     continue;
+                }
 
                 mapItem.SetAliveTimeout(duration);
                 // await mapItem.EnterMapAsync();
@@ -6214,8 +6221,8 @@ namespace Comet.Game.States
             Monster monster = new Monster(monstertype, (uint)IdentityGenerator.Monster.GetNextIdentity, generator);
             if (!await monster.InitializeAsync(idMap, usPosX, usPosY))
             {
-                await Log.WriteLogAsync(LogLevel.Warning,
-                    $"ExecuteActionEventCreatepet [{action.Identity}] could not initialize monster: {param}");
+                await Log.WriteLogAsync(LogLevel.Warning, $"ExecuteActionEventCreatepet [{action.Identity}] could not initialize monster: {param}");
+                IdentityGenerator.Monster.ReturnIdentity(monster.Identity);
                 return false;
             }
 

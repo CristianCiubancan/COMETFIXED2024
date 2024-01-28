@@ -36,6 +36,8 @@ namespace Comet.Game.World
         public static IdentityGenerator Monster = new IdentityGenerator(Role.MONSTERID_FIRST, Role.MONSTERID_LAST);
         public static IdentityGenerator Furniture = new IdentityGenerator(Role.SCENE_NPC_MIN, Role.SCENE_NPC_MAX);
         public static IdentityGenerator Traps = new IdentityGenerator(Role.MAGICTRAPID_FIRST, Role.MAGICTRAPID_LAST);
+        // TODO: maybe add an env variable for this
+        private const double SupplementThreshold = 0.4;
 
         private readonly ConcurrentQueue<long> m_cqidQueue = new ConcurrentQueue<long>();
         private readonly long m_idMax = uint.MaxValue;
@@ -57,11 +59,18 @@ namespace Comet.Game.World
 
         public long GetNextIdentity
         {
-            get
+            get 
             {
-                if (m_cqidQueue.TryDequeue(out long result))
-                    return result;
-                return 0;
+            if (m_cqidQueue.TryDequeue(out long result)) {
+                return result;
+            }
+
+            double usage = 1 - (double)m_cqidQueue.Count / (m_idMax - m_idMin + 1);
+            if (usage >= SupplementThreshold) {
+                SupplementIdentities();
+            }
+
+            return 0;
             }
         }
 
@@ -72,5 +81,15 @@ namespace Comet.Game.World
         }
 
         public int IdentitiesCount() => m_cqidQueue.Count;
+        private void SupplementIdentities()
+        {
+            for (long i = m_idMin; i <= m_idMax; i++)
+            {
+                if (!m_cqidQueue.Contains(i))
+                {
+                    m_cqidQueue.Enqueue(i);
+                }
+            }
+        }
     }
 }

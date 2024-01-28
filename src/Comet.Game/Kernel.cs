@@ -182,7 +182,14 @@ namespace Comet.Game
 
         public static async Task<bool> ChanceCalcAsync(int chance, int outOf)
         {
-            return await NextAsync(outOf) < chance;
+            // TODO: add an env variable for this
+            int multiplier = 10;
+            int adjustedChance = chance * multiplier;
+
+            // Ensure that the adjusted chance does not exceed 'outOf'
+            adjustedChance = Math.Min(adjustedChance, outOf);
+
+            return await NextAsync(outOf) < adjustedChance;
         }
 
         /// <summary>
@@ -239,7 +246,7 @@ namespace Comet.Game
 
         private static readonly string[] _invalidNameChar =
         {
-            "{", "}", "[", "]", "(", ")", "\"", "[gm]", "[pm]", "'", "´", "`", "admin", "helpdesk", " ",
+            "{", "}", "[", "]", "(", ")", "\"", "[gm]", "[pm]", "'", "ï¿½", "`", "admin", "helpdesk", " ",
             "bitch", "puta", "whore", "ass", "fuck", "cunt", "fdp", "porra", "poha", "caralho", "caraio"
         };
     }

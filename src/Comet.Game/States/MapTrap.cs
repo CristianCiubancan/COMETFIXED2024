@@ -251,7 +251,10 @@ namespace Comet.Game.States
                     // only on higher versions we have magic attacks on traps, wont implement this now
 
                     if (ActiveTimes > 0 && RemainingActiveTimes <= 0)
+                    {
                         await LeaveMapAsync();
+                        IdentityGenerator.Traps.ReturnIdentity(Identity);
+                    }
                 }
             }
         }

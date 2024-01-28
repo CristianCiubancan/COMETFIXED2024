@@ -344,14 +344,15 @@ namespace Comet.Game.States
                     await DropMoneyAsync(moneyTmp, 0);
                 }
             }
-
+            // TODO: add an env variable to adjust drop for dbs in particular
+            int multiplier = 100;
             if (await Kernel.ChanceCalcAsync(50, 16500))
             {
                 uint cpsBagType = (uint)await Kernel.NextAsync(729910, 729912);
                 await DropItemAsync(cpsBagType, null);
                 await Log.GmLogAsync("emoney_bag", $"{idDropOwner},{cpsBagType},{attacker?.MapIdentity},{attacker?.MapX},{attacker?.MapY},{MapX},{MapY},{Identity}");
             } 
-            else if (await Kernel.ChanceCalcAsync(625, 54_000_000))
+            else if (await Kernel.ChanceCalcAsync(625, 54_000_000 / multiplier))
             {
                 await DropItemAsync(Item.TYPE_DRAGONBALL, user);
                 await Kernel.RoleManager.BroadcastMsgAsync(

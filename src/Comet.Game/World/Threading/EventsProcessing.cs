@@ -32,6 +32,7 @@ using Comet.Game.States.BaseEntities;
 using Comet.Game.States.Events;
 using Comet.Game.States.Items;
 using Comet.Game.States.NPCs;
+using Comet.Game.World.Managers;
 using Comet.Shared;
 using Comet.Shared.Comet.Shared;
 
@@ -105,7 +106,6 @@ namespace Comet.Game.World.Threading
                     m_queuedActions.RemoveAt(i);
                 }
             }
-
             return true;
         }
 
