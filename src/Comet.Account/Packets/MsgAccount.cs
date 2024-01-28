@@ -97,10 +97,10 @@ namespace Comet.Account.Packets
                 return;
             }
 
-            if (client.Account.StatusID == 1)
-            {
-                // TODO  sync website and check if account is active
-            }
+            // if (client.Account.StatusID == 1)
+            // {
+            //     // TODO  sync website and check if account is active
+            // }
 
             // Connect to the game server
             if (!Kernel.Realms.TryGetValue(Realm, out var server) || server.Server?.Socket.Connected != true)

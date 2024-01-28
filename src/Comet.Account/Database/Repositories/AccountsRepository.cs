@@ -76,6 +76,7 @@ namespace Comet.Account.Database.Repositories
         /// <returns>Returns true if the password is correct.</returns>
         public static bool CheckPassword(string input, string hash, string salt)
         {
+            
             return HashPassword(input, salt).Equals(hash);
         }
 

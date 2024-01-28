@@ -35,10 +35,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sql", "sql", "{FA6B5995-7C5
 		sql\conquer.sql = sql\conquer.sql
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web", "web", "{B4AAF119-4A1C-4E4E-A7E8-1F41FA59484D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Comet.Web.App", "web\Comet.Web.App\Comet.Web.App.csproj", "{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug (x64)|Any CPU = Debug (x64)|Any CPU
@@ -179,22 +175,6 @@ Global
 		{83EFAE67-FB03-4A6A-8A08-2628AEDD9C7C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{83EFAE67-FB03-4A6A-8A08-2628AEDD9C7C}.Release|x64.ActiveCfg = Release|Any CPU
 		{83EFAE67-FB03-4A6A-8A08-2628AEDD9C7C}.Release|x64.Build.0 = Release|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Debug (x64)|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Debug (x64)|Any CPU.Build.0 = Debug|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Debug (x64)|x64.ActiveCfg = Debug|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Debug (x64)|x64.Build.0 = Debug|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Debug|x64.Build.0 = Debug|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Release (x64)|Any CPU.ActiveCfg = Release|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Release (x64)|Any CPU.Build.0 = Release|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Release (x64)|x64.ActiveCfg = Release|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Release (x64)|x64.Build.0 = Release|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Release|x64.ActiveCfg = Release|Any CPU
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -208,7 +188,6 @@ Global
 		{C81DACA7-32F9-483A-BA3A-34C48E31C3D5} = {908B098A-4410-4F12-8BE5-40489F5B027B}
 		{F9487AFC-C15B-4026-9199-EDEAE1809C4B} = {908B098A-4410-4F12-8BE5-40489F5B027B}
 		{83EFAE67-FB03-4A6A-8A08-2628AEDD9C7C} = {8D777D02-43F8-4139-BFF4-96C5D61A49A8}
-		{BDCFA264-0DBF-4C19-83F9-66E6D17BD639} = {B4AAF119-4A1C-4E4E-A7E8-1F41FA59484D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A8305219-BDBB-4FF3-96C4-E25E6A8B4416}
