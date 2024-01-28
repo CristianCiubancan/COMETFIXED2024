@@ -31,8 +31,9 @@ namespace Comet.Game.States
             {
                 reader.Load(new FileStream(path, FileMode.Open, FileAccess.Read));
             }
-            catch
+            catch (Exception ex)
             {
+                await Log.WriteLogAsync(LogLevel.Error, ex.Message);
                 await Log.WriteLogAsync(LogLevel.Error, $"An error ocurred while reading '{path}'. Check for duplicated values or parsing errors! Startup will continue.");
                 return;
             }
