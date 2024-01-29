@@ -952,8 +952,11 @@ namespace Comet.Game.States
                         return false;
                     }
                 }
-
-                await new ServerDbContext().Database.ExecuteSqlRawAsync(param);
+                // TODO: add the WinSyndicate procedure and remove the condition
+                if (!param.Contains("WinSyndicate"))
+                {
+                    await new ServerDbContext().Database.ExecuteSqlRawAsync(param);
+                }
             }
             catch (Exception ex)
             {
