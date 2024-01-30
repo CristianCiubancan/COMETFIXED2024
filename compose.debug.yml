@@ -3,8 +3,17 @@ version: '3.8'
 networks:
   backend:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16  # Define a custom subnet for the backend network
+  
   frontend:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.21.0.0/16  # Define a custom subnet for the frontend network
 
 services:
   db-admin:
@@ -36,8 +45,10 @@ services:
       args:
         - debug
     networks:
-      - backend
-      - frontend
+      backend:
+        ipv4_address: 172.20.0.22  # Assign a specific IP address in the backend network
+      frontend:
+        ipv4_address: 172.21.0.22  # Assign a specific IP address in the frontend network
     ports:
       - 9958:9958
     depends_on:
@@ -52,8 +63,10 @@ services:
       args:
         - debug
     networks:
-      - backend
-      - frontend
+      backend:
+        ipv4_address: 172.20.0.4  # Assign a specific IP address in the backend network
+      frontend:
+        ipv4_address: 172.21.0.4  # Assign a specific IP address in the frontend network
     ports:
       - 5816:5816
     depends_on:

@@ -71,6 +71,7 @@ namespace Comet.Game.World.Threading
                 await Log.WriteLogAsync(LogLevel.Info, "Attempting connection with the account server...");
 
                 Kernel.AccountClient = new AccountClient();
+                await Log.WriteLogAsync(LogLevel.Info, $"Attempting to connect to account server at {AccountClient.Configuration.IPAddress}:{AccountClient.Configuration.Port}");
                 if (await Kernel.AccountClient.ConnectToAsync(AccountClient.Configuration.IPAddress, AccountClient.Configuration.Port))
                 {
                     await Log.WriteLogAsync(LogLevel.Info, "Connected to the account server!");

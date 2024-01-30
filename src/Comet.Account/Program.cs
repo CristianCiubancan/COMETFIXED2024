@@ -89,7 +89,8 @@ namespace Comet.Account
 
             await Log.WriteLogAsync(LogLevel.Info, "Launching realm server listener...");
             var realmServer = new IntraServer(config);
-            _ = realmServer.StartAsync(config.RealmNetwork.Port);
+            _ = realmServer.StartAsync(config.RealmNetwork.Port, config.RealmNetwork.IPAddress);
+            await Log.WriteLogAsync(LogLevel.Info, $"Realm server listening on {config.RealmNetwork.IPAddress}:{config.RealmNetwork.Port}");
 
             // Start the server listener
             await Log.WriteLogAsync(LogLevel.Info, "Launching server listener...");
