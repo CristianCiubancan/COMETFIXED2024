@@ -122,12 +122,25 @@ namespace Comet.Game.World
         /// </summary>
         public uint SelectPartition()
         {
-            uint partition = m_Partitions.Where(x => x.ID >= NORMAL_MAP_GROUP).Aggregate((aggr, next) =>
+            if (Count <= 3)
+            {
+                uint partition = m_Partitions.Where(x => x.ID >= NORMAL_MAP_GROUP).Aggregate((aggr, next) =>
                                                                             next.Weight.CompareTo(aggr.Weight) < 0
                                                                                 ? next
                                                                                 : aggr).ID;
-            Interlocked.Increment(ref m_Partitions[partition].Weight);
-            return partition;
+                Interlocked.Increment(ref m_Partitions[partition].Weight);
+                return partition;
+            }
+            else
+            {
+                // in case of more than 3 partitions, select a random partition from the partitions with minimum weight
+                var minWeight = m_Partitions.Min(p => p.Weight);
+                var partitions = m_Partitions.Where(p => p.Weight == minWeight).ToList();
+                var random = new Random();
+                uint partition = partitions[random.Next(partitions.Count)].ID;
+                Interlocked.Increment(ref m_Partitions[partition].Weight);
+                return partition;
+            }
         }
 
         public void SelectPartition(uint partition)
