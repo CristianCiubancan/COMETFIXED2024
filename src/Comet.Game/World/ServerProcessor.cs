@@ -123,7 +123,7 @@ namespace Comet.Game.World
         public uint SelectPartition()
         {
             Log.WriteLogAsync(LogLevel.Debug, $"The core count is {Count}").ConfigureAwait(false);
-            if (Count <= 3)
+            if (Count >= 3)
             {
                 uint partition = m_Partitions.Where(x => x.ID >= NORMAL_MAP_GROUP).Aggregate((aggr, next) =>
                                                                             next.Weight.CompareTo(aggr.Weight) < 0
