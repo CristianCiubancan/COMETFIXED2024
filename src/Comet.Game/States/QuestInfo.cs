@@ -16,7 +16,7 @@ namespace Comet.Game.States
 
         public static async Task InitializeAsync()
         {
-            string path = Path.Combine(Environment.CurrentDirectory, "ini", "QuestInfo.ini");
+            string path = Path.Combine(Environment.CurrentDirectory, "ini", "Questinfo.ini");
             if (!File.Exists(path))
             {
                 await Log.WriteLogAsync(LogLevel.Warning, $"File '{path}' is missing");
