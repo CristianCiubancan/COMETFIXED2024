@@ -38,9 +38,10 @@ namespace Comet.Game.World
 {
     public class ServerProcessor : BackgroundService
     {
-        public const int NO_MAP_GROUP = 0;
-        public const int PVP_MAP_GROUP = 1;
-        public const int NORMAL_MAP_GROUP = 2;
+        public static Boolean isMultiThreaded = (Environment.ProcessorCount / 2) >= 3;
+        public static int NO_MAP_GROUP = isMultiThreaded ? 0 : 0;
+        public static int PVP_MAP_GROUP = isMultiThreaded ? 1 : 0;
+        public static int NORMAL_MAP_GROUP = isMultiThreaded ? 2 : 0;
         protected readonly Task[] m_BackgroundTasks;
         protected readonly Channel<Func<Task>>[] m_Channels;
         protected readonly Partition[] m_Partitions;
@@ -122,7 +123,6 @@ namespace Comet.Game.World
         /// </summary>
         public uint SelectPartition()
         {
-            Log.WriteLogAsync(LogLevel.Debug, $"The core count is {Count}").ConfigureAwait(false);
             if (Count >= 3)
             {
                 uint partition = m_Partitions.Where(x => x.ID >= NORMAL_MAP_GROUP).Aggregate((aggr, next) =>
