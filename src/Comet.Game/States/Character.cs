@@ -2128,6 +2128,11 @@ namespace Comet.Game.States
 
             for (Item.ItemPosition i = Item.ItemPosition.Headwear; i <= Item.ItemPosition.Crop; i++)
             {
+                // there will be a 33% chance of reducing durability for each equipment slot
+                var random = await Kernel.Services.Randomness.NextAsync(0, 3);
+                // if we should not reduce we will continue to the next item
+                if(random != 0) continue;
+
                 if (i == Item.ItemPosition.Garment || i == Item.ItemPosition.Gourd || i == Item.ItemPosition.Steed
                     || i == Item.ItemPosition.SteedArmor || i == Item.ItemPosition.LeftHandAccessory ||
                     i == Item.ItemPosition.RightHandAccessory)
