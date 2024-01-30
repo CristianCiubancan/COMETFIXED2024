@@ -2503,7 +2503,8 @@ namespace Comet.Game.States
                 await SendGemEffect2Async();
 
             if (!Map.IsTrainingMap())
-                await DecEquipmentDurabilityAsync(true, (int) magic, (ushort) (power > MaxLife / 4 ? 3 : 1));
+                await DecEquipmentDurabilityAsync(true, (int) magic, (ushort) (power > MaxLife / 4 ? 1 : 1));
+                // await DecEquipmentDurabilityAsync(true, (int) magic, (ushort) (power > MaxLife / 4 ? 10 : 1)); // useItemNum was 10 we changed to 1 as dura was going down too fast
 
             if (MagicData.QueryMagic != null && MagicData.State == MagicData.MagicState.Intone)
                 await MagicData.AbortMagicAsync(true);
