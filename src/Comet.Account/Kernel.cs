@@ -41,7 +41,6 @@ namespace Comet.Account
     public static class Kernel
     {
         public static Dictionary<string, DbRealm> Realms;
-        public static ConcurrentDictionary<uint, Client> Clients = new ConcurrentDictionary<uint, Client>();
         public static ConcurrentDictionary<uint, Player> Players = new ConcurrentDictionary<uint, Player>();
 
         // Background services
