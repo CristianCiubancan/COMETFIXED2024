@@ -22,6 +22,7 @@
 #region References
 
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Comet.Game.States.BaseEntities;
@@ -36,10 +37,10 @@ namespace Comet.Game.World
         public static IdentityGenerator Monster = new IdentityGenerator(Role.MONSTERID_FIRST, Role.MONSTERID_LAST);
         public static IdentityGenerator Furniture = new IdentityGenerator(Role.SCENE_NPC_MIN, Role.SCENE_NPC_MAX);
         public static IdentityGenerator Traps = new IdentityGenerator(Role.MAGICTRAPID_FIRST, Role.MAGICTRAPID_LAST);
+        private object IdentityLock = new();
         // TODO: maybe add an env variable for this
         private const double SupplementThreshold = 0.4;
-
-        private readonly ConcurrentQueue<long> m_cqidQueue = new ConcurrentQueue<long>();
+        private readonly Queue<long> queue = new();
         private readonly long m_idMax = uint.MaxValue;
         private readonly long m_idMin;
         private long m_idNext;
@@ -51,7 +52,7 @@ namespace Comet.Game.World
 
             for (long i = m_idMin; i <= m_idMax; i++)
             {
-                m_cqidQueue.Enqueue(i);
+                queue.Enqueue(i);
             }
 
             m_idNext = m_idMax + 1;
@@ -61,34 +62,38 @@ namespace Comet.Game.World
         {
             get 
             {
-            if (m_cqidQueue.TryDequeue(out long result)) {
-                return result;
-            }
-
-            double usage = 1 - (double)m_cqidQueue.Count / (m_idMax - m_idMin + 1);
-            if (usage >= SupplementThreshold) {
-                SupplementIdentities();
-            }
-
-            return 0;
+                lock (IdentityLock)
+                {
+                    if (queue.TryDequeue(out long result))
+                    {
+                        return result;
+                    }
+                    return 0;
+                }
             }
         }
 
         public void ReturnIdentity(long id)
         {
-            if (!m_cqidQueue.Contains(id))
-                m_cqidQueue.Enqueue(id);
+            if (id < m_idMin || id > m_idMax)
+            {
+                return;
+            }
+
+            lock (IdentityLock)
+            {
+                if (!queue.Contains(id))
+                {
+                    queue.Enqueue(id);
+                }
+            }
         }
 
-        public int IdentitiesCount() => m_cqidQueue.Count;
-        private void SupplementIdentities()
+        public int IdentitiesCount()
         {
-            for (long i = m_idMin; i <= m_idMax; i++)
+            lock (IdentityLock)
             {
-                if (!m_cqidQueue.Contains(i))
-                {
-                    m_cqidQueue.Enqueue(i);
-                }
+                return queue.Count;
             }
         }
     }

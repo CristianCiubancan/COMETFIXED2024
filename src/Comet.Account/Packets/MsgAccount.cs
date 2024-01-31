@@ -25,6 +25,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Comet.Account.Database.Repositories;
+using Comet.Account.Managers;
 using Comet.Account.States;
 using Comet.Network.Packets;
 using Comet.Network.Security;
@@ -114,7 +115,7 @@ namespace Comet.Account.Packets
 
             client.Realm = server;
 
-            Kernel.Clients.TryAdd(client.Account.AccountID, client);
+            ClientManager.AddClient(client);
 
             await server.Server.SendAsync(new MsgAccServerLoginExchange
             {

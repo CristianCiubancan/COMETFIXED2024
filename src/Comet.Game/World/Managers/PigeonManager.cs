@@ -43,7 +43,7 @@ namespace Comet.Game.World.Managers
         private const int PIGEON_TOP_ADDITION = 15;
         private const int PIGEON_MAX_MSG_LENGTH = 80;
         private const int PIGEON_STAND_SECS = 60;
-
+        private static readonly object LockObject = new();
         private List<DbPigeon> m_past = new List<DbPigeon>();
         private List<DbPigeonQueue> m_queue = new List<DbPigeonQueue>();
         private DbPigeon m_current = null;
@@ -98,7 +98,10 @@ namespace Comet.Game.World.Managers
 
             await BaseRepository.SaveAsync(pigeon);
 
-            m_queue.Add(pigeon);
+            lock (LockObject)
+            {
+                m_queue.Add(pigeon);
+            }
 
             if (forceShow || m_next.IsTimeOut(PIGEON_STAND_SECS))
                 await SyncAsync();
@@ -112,15 +115,17 @@ namespace Comet.Game.World.Managers
         {
             DbPigeonQueue pigeon = null;
             int position = 0;
-
-            for (int i = 0; i < m_queue.Count; i++)
+            lock (LockObject)
             {
-                if (m_queue[i].Identity == request.Param &&
-                    m_queue[i].UserIdentity == sender.Identity)
+                for (int i = 0; i < m_queue.Count; i++)
                 {
-                    position = i;
-                    pigeon = m_queue[i];
-                    break;
+                    if (m_queue[i].Identity == request.Param &&
+                        m_queue[i].UserIdentity == sender.Identity)
+                    {
+                        position = i;
+                        pigeon = m_queue[i];
+                        break;
+                    }
                 }
             }
 
@@ -151,9 +156,11 @@ namespace Comet.Game.World.Managers
                     newPos = 0;
                     break;
             }
-
-            m_queue.RemoveAt(position);
-            m_queue.Insert(newPos, pigeon);
+            lock (LockObject)
+            {
+                m_queue.RemoveAt(position);
+                m_queue.Insert(newPos, pigeon);
+            }
 
             await RebuildQueueAsync();
             await sender.SendAsync(Language.StrPigeonSendProducePrompt);
@@ -162,11 +169,14 @@ namespace Comet.Game.World.Managers
         public Task RebuildQueueAsync()
         {
             uint idx = 0;
-            foreach (var queued in m_queue)
+            lock (LockObject)
             {
-                queued.NextIdentity = idx++;
+                foreach (var queued in m_queue)
+                {
+                    queued.NextIdentity = idx++;
+                }
+                return BaseRepository.SaveAsync(m_queue);
             }
-            return BaseRepository.SaveAsync(m_queue);
         }
 
         public async Task SyncAsync()
@@ -186,8 +196,11 @@ namespace Comet.Game.World.Managers
             });
             await BaseRepository.DeleteAsync(m_queue[0]);
 
-            m_queue.RemoveAt(0);
-            m_past.Add(m_current);
+            lock (LockObject)
+            {
+                m_queue.RemoveAt(0);
+                m_past.Add(m_current);
+            }
 
             await RebuildQueueAsync();
             await Kernel.RoleManager.BroadcastMsgAsync(new MsgTalk(m_current.UserIdentity,  MsgTalk.TalkChannel.Broadcast, Color.White, MsgTalk.ALLUSERS, m_current.UserName, m_current.Message));
@@ -204,22 +217,31 @@ namespace Comet.Game.World.Managers
             await SyncAsync();
         }
 
-        public async Task SendListAsync(Character user, MsgPigeon.PigeonMode request)
+        public async Task SendListAsync(Character user, MsgPigeon.PigeonMode request, int page)
         {
+            const int ipp = 10;
             List<DbPigeonQueue> temp;
-            if (request == MsgPigeon.PigeonMode.Query)
+            lock (LockObject)
             {
-                temp = new List<DbPigeonQueue>(m_queue);
-            }
-            else
-            {
-                temp = new List<DbPigeonQueue>(m_queue.FindAll(x => x.UserIdentity == user.Identity));
+                if (request == MsgPigeon.PigeonMode.Query)
+                {
+                    temp = new List<DbPigeonQueue>(m_queue);
+                }
+                else
+                {
+                    temp = new List<DbPigeonQueue>(m_queue.FindAll(x => x.UserIdentity == user.Identity));
+                }
             }
 
-            uint pos = 0;
+            var pos = (uint)(page * ipp);
+            DbPigeonQueue[] queryList;
+            lock (LockObject)
+            {
+                queryList = temp.Skip((int)pos).Take(ipp).ToArray();
+            }
             MsgPigeonQuery msg = new MsgPigeonQuery
             {
-                Mode = 0
+                Mode = (uint)page
             };
             bool sent = false;
             foreach (var pigeon in temp)
@@ -252,6 +274,12 @@ namespace Comet.Game.World.Managers
                 await user.SendAsync(new MsgTalk(m_current.UserIdentity, MsgTalk.TalkChannel.Broadcast, Color.White, MsgTalk.ALLUSERS, m_current.UserName, m_current.Message));
         }
 
-        public int OnQueueByUser(uint idUser) => m_queue.Count(x => x.UserIdentity == idUser);
+        public int OnQueueByUser(uint idUser)
+        {
+            lock (LockObject)
+            {
+                return m_queue.Count(x => x.UserIdentity == idUser);
+            }
+        }
     }
 }

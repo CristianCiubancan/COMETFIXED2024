@@ -26,6 +26,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Comet.Account.Database;
+using Comet.Account.Managers;
 using Comet.Account.Packets;
 using Comet.Account.States;
 using Comet.Network.Packets;
@@ -145,7 +146,7 @@ namespace Comet.Account
         protected override void Disconnected(Client actor)
         {
             if (actor.Account != null)
-                Kernel.Clients.TryRemove(actor.Account.AccountID, out _);
+                ClientManager.RemoveClient(actor.Account.AccountID);
         }
     }
 }
