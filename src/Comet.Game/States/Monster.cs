@@ -354,10 +354,20 @@ namespace Comet.Game.States
             } 
             else if (await Kernel.ChanceCalcAsync(625, 54_000_000 / multiplier))
             {
-                await DropItemAsync(Item.TYPE_DRAGONBALL, user);
-                await Kernel.RoleManager.BroadcastMsgAsync(
-                    string.Format(Language.StrDragonBallDropped, attacker?.Name ?? Language.StrNone,
+                if (user.VipLevel >= 6)
+                {
+                    await user.UserPackage.AwardItemAsync(Item.TYPE_DRAGONBALL);
+                    await Kernel.RoleManager.BroadcastMsgAsync(
+                    string.Format(Language.StrDragonBallVipLooted, attacker?.Name ?? Language.StrNone,
                         attacker?.Map.Name ?? Language.StrNone), MsgTalk.TalkChannel.TopLeft);
+                }
+                else
+                {
+                    await DropItemAsync(Item.TYPE_DRAGONBALL, user);
+                    await Kernel.RoleManager.BroadcastMsgAsync(
+                        string.Format(Language.StrDragonBallDropped, attacker?.Name ?? Language.StrNone,
+                            attacker?.Map.Name ?? Language.StrNone), MsgTalk.TalkChannel.TopLeft);
+                }
 
                 if (user != null)
                     await user.AddActivityPointsAsync(1);
@@ -449,7 +459,17 @@ namespace Comet.Game.States
                 if (drop.Create(Map, targetPos, itemtype, owner?.Identity ?? 0, 0, 0, 0))
                 {
                     await drop.GenerateRandomInfoAsync();
-                    await drop.EnterMapAsync();
+
+                    if (drop.Info.ReduceDamage == 5)
+                    {
+                        // we want to award the item directly to the owner
+                        if (owner!= null && owner.VipLevel >= 6)
+                        await owner.UserPackage.AwardItemAsync(drop.Info.Type);
+                    }
+                    else
+                    {
+                        await drop.EnterMapAsync();
+                    }
 
                     if (drop.Info.Addition > 0 && owner?.Guide != null)
                         await owner.Guide.AwardOpportunityAsync(1);

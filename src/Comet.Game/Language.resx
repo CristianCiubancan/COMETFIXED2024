@@ -213,6 +213,9 @@
   <data name="StrDragonBallDropped" xml:space="preserve">
     <value>{0} has dropped a Dragon Ball in {1}.</value>
   </data>
+    <data name="StrDragonBallVipLooted" xml:space="preserve">
+    <value>{0} has looted a Dragon Ball directly in {1} Because he is a maximum tire VIP.</value>
+  </data>
   <data name="StrDropEquip" xml:space="preserve">
     <value>{0} items have been detained by {1}`s help. Please find {2} ({3}, {4}) to redeem within 7 days, or they will be awarded to that player.</value>
   </data>

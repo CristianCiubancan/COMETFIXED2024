@@ -347,7 +347,14 @@ namespace Comet.Game {
                 return ResourceManager.GetString("StrDragonBallDropped", resourceCulture);
             }
         }
-        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} has looted a Dragon Ball directly in {1} Because he is a maximum tire VIP...
+        /// </summary>
+        public static string StrDragonBallVipLooted {
+            get {
+                return ResourceManager.GetString("StrDragonBallVipLooted", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to {0} items have been detained by {1}`s help. Please find {2} ({3}, {4}) to redeem within 7 days, or they will be awarded to that player..
         /// </summary>
