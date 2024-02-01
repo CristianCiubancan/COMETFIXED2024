@@ -355,7 +355,7 @@ namespace Comet.Game {
             }
         }
         /// <summary>
-        ///   Looks up a localized string similar to {0} has looted a Dragon Ball directly in {1} Because he is a maximum tire VIP...
+        ///   Looks up a localized string similar to {0} has looted a Dragon Ball directly in {1} Because he is a maximum tier VIP...
         /// </summary>
         public static string StrDragonBallVipLooted {
             get {

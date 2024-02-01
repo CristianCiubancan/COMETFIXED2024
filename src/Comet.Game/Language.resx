@@ -139,7 +139,7 @@
     <value>{0} has earned {1} virtue points for helping newbies.</value>
   </data>
   <data name="StrBlessedItemDrop" xml:space="preserve">
-    <value>Congratulations! A -5 {0} has droped near you!</value>
+    <value>Congratulations! A -5 {0} has droped near you at {1} ,{2} !</value>
   </data>
   <data name="StrBonus" xml:space="preserve">
     <value>Congratulations! You have got {0} prizes.  Please find PrizeNPC in the market (185,170) to claim your rewards!</value>
@@ -217,7 +217,7 @@
     <value>{0} has dropped a Dragon Ball in {1}.</value>
   </data>
     <data name="StrDragonBallVipLooted" xml:space="preserve">
-    <value>{0} has looted a Dragon Ball directly in {1} Because he is a maximum tire VIP.</value>
+    <value>{0} has looted a Dragon Ball directly in {1} Because he is a maximum tier VIP.</value>
   </data>
   <data name="StrDropEquip" xml:space="preserve">
     <value>{0} items have been detained by {1}`s help. Please find {2} ({3}, {4}) to redeem within 7 days, or they will be awarded to that player.</value>

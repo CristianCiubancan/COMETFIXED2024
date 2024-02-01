@@ -341,7 +341,7 @@ namespace Comet.Game.States
                 {
                     uint moneyTmp = (uint)Calculations.MulDiv((int)moneyAve, 90 + await Kernel.NextAsync(3, 21), 100);
 
-                    if (user.VipLevel >= 6)
+                    if (user.VipLevel >= 6 && user != null)
                     {
                         await user.AwardMoneyAsync((int)(moneyTmp * 0.2));
                     }
@@ -477,7 +477,7 @@ namespace Comet.Game.States
                     
                     if (drop.Info.ReduceDamage == 5 && owner!= null && owner.VipLevel >= 6)
                     {
-                        await owner.SendAsync(string.Format(Language.StrBlessedItemDrop, drop.Name), MsgTalk.TalkChannel.Center, Color.Red);
+                        await owner.SendAsync(string.Format(Language.StrBlessedItemDrop, drop.Name, drop.MapX, drop.MapY), MsgTalk.TalkChannel.Center, Color.Red);
                     }
 
                     if (drop.Info.Addition > 0 && owner?.Guide != null)
