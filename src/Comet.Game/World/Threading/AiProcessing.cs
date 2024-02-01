@@ -22,6 +22,7 @@
 #region References
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Comet.Shared;
 using Comet.Shared.Comet.Shared;
@@ -32,7 +33,7 @@ namespace Comet.Game.World.Threading
 {
     public sealed class AiProcessor : TimerBase
     {
-        public AiProcessor() 
+        public AiProcessor()
             : base(500, "Ai Thread")
         {
         }
@@ -41,20 +42,39 @@ namespace Comet.Game.World.Threading
 
         protected override async Task<bool> OnElapseAsync()
         {
+            var cts = new CancellationTokenSource(2000); // Set a 2-second timeout
             try
             {
                 ProcessedMonsters = 0;
-                foreach (var map in Kernel.MapManager.GameMaps.Values)
-                    ProcessedMonsters += await map.OnTimerAsync();
-                await Kernel.RoleManager.OnRoleTimerAsync();
+                // Wrap your AI processing tasks in a Task.Run to support cancellation
+                var aiProcessingTask = Task.Run(async () =>
+                {
+                    foreach (var map in Kernel.MapManager.GameMaps.Values)
+                    {
+                        // Check for cancellation before starting each potentially long operation
+                        cts.Token.ThrowIfCancellationRequested();
+                        ProcessedMonsters += await map.OnTimerAsync();
+                    }
+
+                    // Check for cancellation before another potentially long operation
+                    cts.Token.ThrowIfCancellationRequested();
+                    await Kernel.RoleManager.OnRoleTimerAsync();
+                }, cts.Token);
+
+                await aiProcessingTask; // This will throw TaskCanceledException if the task is cancelled
+                return true; // Indicates successful completion without timeout
+            }
+            catch (OperationCanceledException)
+            {
+                await Log.WriteLogAsync(LogLevel.Warning, "AiProcessor::OnElapseAsync exceeded the timeout period.");
+                return false; // Indicates a timeout occurred
             }
             catch (Exception ex)
             {
-                await Log.WriteLogAsync(LogLevel.Error, $"AiProcessing::OnElapseAsync error");
+                await Log.WriteLogAsync(LogLevel.Error, "AiProcessing::OnElapseAsync encountered an error.");
                 await Log.WriteLogAsync(LogLevel.Exception, ex.ToString());
+                return false; // Indicates an error occurred
             }
-
-            return true;
         }
     }
 }

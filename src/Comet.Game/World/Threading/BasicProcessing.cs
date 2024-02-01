@@ -72,9 +72,18 @@ namespace Comet.Game.World.Threading
 
                 Kernel.AccountClient = new AccountClient();
                 await Log.WriteLogAsync(LogLevel.Info, $"Attempting to connect to account server at {AccountClient.Configuration.IPAddress}:{AccountClient.Configuration.Port}");
-                if (await Kernel.AccountClient.ConnectToAsync(AccountClient.Configuration.IPAddress, AccountClient.Configuration.Port))
+
+                var connectTask = Kernel.AccountClient.ConnectToAsync(AccountClient.Configuration.IPAddress, AccountClient.Configuration.Port);
+                if (await Task.WhenAny(connectTask, Task.Delay(2000)) == connectTask && await connectTask)
                 {
+                    // Connection attempt finished within 2 seconds and was successful.
                     await Log.WriteLogAsync(LogLevel.Info, "Connected to the account server!");
+                }
+                else
+                {
+                    // Connection attempt either took longer than 2 seconds or failed.
+                    await Log.WriteLogAsync(LogLevel.Warning, "Failed to connect to the account server within the timeout period.");
+                    // Consider handling the timeout or failure case here.
                 }
             }
 

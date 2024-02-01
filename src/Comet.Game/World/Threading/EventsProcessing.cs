@@ -25,6 +25,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Comet.Core;
 using Comet.Game.States;
@@ -55,60 +56,75 @@ namespace Comet.Game.World.Threading
 
         protected override async Task<bool> OnElapseAsync()
         {
-            await Kernel.PigeonManager.OnTimerAsync();
+            var cts = new CancellationTokenSource();
+            cts.CancelAfter(2000); // Set timeout for 2 seconds.
 
-            bool ranking = m_rankingBroadcast.ToNextTime();
-            foreach (var dynaNpc in Kernel.RoleManager.QueryRoleByType<DynamicNpc>())
+            try
             {
-                if (dynaNpc.IsGoal())
-                    continue;
-
-                await dynaNpc.CheckFightTimeAsync();
-
-                if(ranking && m_events.Values.All(x => x.Map?.Identity != dynaNpc.MapIdentity)) 
-                    await dynaNpc.BroadcastRankingAsync();
-            }
-
-            foreach (var @event in m_events.Values)
-            {
-                if (@event.ToNextTime())
-                    await @event.OnTimerAsync();
-            }
-
-            //foreach (var action in m_queuedActions.Values)
-            //{
-            //    Character user = Kernel.RoleManager.GetUser(action.UserIdentity);
-            //    if (action.CanBeExecuted && user != null)
-            //    {
-            //        await GameAction.ExecuteActionAsync(action.Action, user, null, null, "");
-            //        m_queuedActions.TryRemove(user.Identity, out _);
-            //    }
-            //}
-
-            for (int i = m_queuedActions.Count - 1; i >= 0; i--)
-            {
-                var action = m_queuedActions[i];
-                Character user = Kernel.RoleManager.GetUser(action.UserIdentity);
-                if (action.CanBeExecuted && user != null)
+                // Wrap potentially long-running operations in a task to allow for cancellation.
+                var task = Task.Run(async () =>
                 {
-                    Item item = null;
-                    if (user.InteractingItem != 0)
+                    await Kernel.PigeonManager.OnTimerAsync();
+
+                    bool ranking = m_rankingBroadcast.ToNextTime();
+                    foreach (var dynaNpc in Kernel.RoleManager.QueryRoleByType<DynamicNpc>())
                     {
-                        item = user.UserPackage.FindByIdentity(user.InteractingItem);
-                    }
-                    Role role = null;
-                    if (user.InteractingNpc != 0)
-                    {
-                        role = Kernel.RoleManager.GetRole(user.InteractingNpc);
+                        if (dynaNpc.IsGoal() || cts.IsCancellationRequested)
+                            continue;
+
+                        await dynaNpc.CheckFightTimeAsync();
+
+                        if (ranking && m_events.Values.All(x => x.Map?.Identity != dynaNpc.MapIdentity))
+                            await dynaNpc.BroadcastRankingAsync();
                     }
 
-                    await GameAction.ExecuteActionAsync(action.Action, user, role, item, "");
-                    m_queuedActions.RemoveAt(i);
-                }
+                    foreach (var @event in m_events.Values)
+                    {
+                        if (@event.ToNextTime() && !cts.IsCancellationRequested)
+                            await @event.OnTimerAsync();
+                    }
+
+                    // Process queued actions, considering cancellation token as well.
+                    for (int i = m_queuedActions.Count - 1; i >= 0; i--)
+                    {
+                        if (cts.IsCancellationRequested)
+                            break;
+
+                        var action = m_queuedActions[i];
+                        Character user = Kernel.RoleManager.GetUser(action.UserIdentity);
+                        if (action.CanBeExecuted && user != null)
+                        {
+                            Item item = null;
+                            if (user.InteractingItem != 0)
+                            {
+                                item = user.UserPackage.FindByIdentity(user.InteractingItem);
+                            }
+                            Role role = null;
+                            if (user.InteractingNpc != 0)
+                            {
+                                role = Kernel.RoleManager.GetRole(user.InteractingNpc);
+                            }
+
+                            await GameAction.ExecuteActionAsync(action.Action, user, role, item, "");
+                            m_queuedActions.RemoveAt(i); m_queuedActions.RemoveAt(i);
+                        }
+                    }
+                }, cts.Token);
+
+                await task;
+                return !cts.IsCancellationRequested;
             }
-            return true;
+            catch (TaskCanceledException)
+            {
+                // Handle the timeout scenario.
+                await Log.WriteLogAsync(LogLevel.Info, "EventsProcessing thread maybe got deadlocked");
+                return false;
+            }
+            finally
+            {
+                cts.Dispose();
+            }
         }
-
         protected override async Task OnStartAsync()
         {
             await RegisterEventAsync(new TimedGuildWar());
