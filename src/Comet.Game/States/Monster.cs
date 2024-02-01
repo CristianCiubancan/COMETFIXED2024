@@ -469,8 +469,12 @@ namespace Comet.Game.States
                 {
                     await drop.GenerateRandomInfoAsync();
                     await drop.EnterMapAsync();
-                    await owner.SendAsync(string.Format(Language.StrBlessedItemDrop, drop.Name), MsgTalk.TalkChannel.System, Color.Red);
-
+                    
+                    if (drop.Info.ReduceDamage == 5 && owner!= null && owner.VipLevel >= 6)
+                    {
+                        await owner.SendAsync(string.Format(Language.StrBlessedItemDrop, drop.Name), MsgTalk.TalkChannel.System, Color.Red);
+                    }
+                    
                     if (drop.Info.Addition > 0 && owner?.Guide != null)
                         await owner.Guide.AwardOpportunityAsync(1);
                 }
