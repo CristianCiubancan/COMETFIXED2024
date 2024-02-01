@@ -36,6 +36,7 @@ services:
       - ./sql/data:/var/lib/mysql
     ports:
       - "3306:3306" 
+    command: --max_allowed_packet=64M
 
   account:
     container_name: comet-account
