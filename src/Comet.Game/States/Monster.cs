@@ -341,7 +341,7 @@ namespace Comet.Game.States
                 {
                     uint moneyTmp = (uint)Calculations.MulDiv((int)moneyAve, 90 + await Kernel.NextAsync(3, 21), 100);
 
-                    if (user.VipLevel >= 6 && user != null)
+                    if (user != null && user.VipLevel >= 6)
                     {
                         await user.AwardMoneyAsync((int)(moneyTmp * 0.2));
                     }
