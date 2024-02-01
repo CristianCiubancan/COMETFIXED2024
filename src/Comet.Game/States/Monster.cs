@@ -356,7 +356,16 @@ namespace Comet.Game.States
             {
                 if (user.VipLevel >= 6)
                 {
-                    await user.UserPackage.AwardItemAsync(Item.TYPE_DRAGONBALL);
+                    // await user.UserPackage.AwardItemAsync(Item.TYPE_DRAGONBALL);
+                    // if the user already has 9 dragon balls we want to get rid of them and award a db scroll
+                    if (user.UserPackage.MultiCheckItem(Item.TYPE_DRAGONBALL, Item.TYPE_DRAGONBALL, 9, true))
+                    {
+                        await user.UserPackage.MultiSpendItemAsync(Item.TYPE_DRAGONBALL,Item.TYPE_DRAGONBALL, 9, true);
+                        await user.UserPackage.AwardItemAsync(Item.TYPE_DRAGONBALL_SCROLL);
+                    }
+                    else {
+                        await user.UserPackage.AwardItemAsync(Item.TYPE_DRAGONBALL);
+                    }
                     await Kernel.RoleManager.BroadcastMsgAsync(
                     string.Format(Language.StrDragonBallVipLooted, attacker?.Name ?? Language.StrNone,
                         attacker?.Map.Name ?? Language.StrNone), MsgTalk.TalkChannel.TopLeft);
@@ -460,10 +469,9 @@ namespace Comet.Game.States
                 {
                     await drop.GenerateRandomInfoAsync();
 
-                    if (drop.Info.ReduceDamage == 5)
+                    if (drop.Info.ReduceDamage == 5 && owner!= null && owner.VipLevel >= 6)
                     {
                         // we want to award the item directly to the owner
-                        if (owner!= null && owner.VipLevel >= 6)
                         await owner.UserPackage.AwardItemAsync(drop.Info.Type);
                     }
                     else
