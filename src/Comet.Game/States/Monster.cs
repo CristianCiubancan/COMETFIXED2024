@@ -468,16 +468,8 @@ namespace Comet.Game.States
                 if (drop.Create(Map, targetPos, itemtype, owner?.Identity ?? 0, 0, 0, 0))
                 {
                     await drop.GenerateRandomInfoAsync();
-
-                    if (drop.Info.ReduceDamage == 5 && owner!= null && owner.VipLevel >= 6)
-                    {
-                        // we want to award the item directly to the owner
-                        await owner.UserPackage.AwardItemAsync(drop.Info.Type);
-                    }
-                    else
-                    {
-                        await drop.EnterMapAsync();
-                    }
+                    await drop.EnterMapAsync();
+                    await owner.SendAsync(string.Format(Language.StrBlessedItemDrop, drop.Name), MsgTalk.TalkChannel.System, Color.Red);
 
                     if (drop.Info.Addition > 0 && owner?.Guide != null)
                         await owner.Guide.AwardOpportunityAsync(1);

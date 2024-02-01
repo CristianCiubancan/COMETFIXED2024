@@ -122,7 +122,14 @@ namespace Comet.Game {
                 return ResourceManager.GetString("StrAwardVirtue", resourceCulture);
             }
         }
-        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid coordinate..
+        /// </summary>
+        public static string StrBlessedItemDrop {
+            get {
+                return ResourceManager.GetString("StrBlessedItemDrop", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Congratulations! You have got {0} prizes.  Please find PrizeNPC in the market (185,170) to claim your rewards!.
         /// </summary>

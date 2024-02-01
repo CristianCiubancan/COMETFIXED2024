@@ -138,6 +138,9 @@
   <data name="StrAwardVirtue" xml:space="preserve">
     <value>{0} has earned {1} virtue points for helping newbies.</value>
   </data>
+  <data name="StrBlessedItemDrop" xml:space="preserve">
+    <value>Congratulations! A -5 {0} has droped near you!</value>
+  </data>
   <data name="StrBonus" xml:space="preserve">
     <value>Congratulations! You have got {0} prizes.  Please find PrizeNPC in the market (185,170) to claim your rewards!</value>
   </data>
