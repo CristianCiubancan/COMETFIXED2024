@@ -66,7 +66,7 @@ namespace Comet.Game.World.Threading
             }
             catch (OperationCanceledException)
             {
-                await Log.WriteLogAsync(LogLevel.Warning, "AiProcessor::OnElapseAsync exceeded the timeout period.");
+                await Log.WriteLogAsync(LogLevel.Warning, "AiProcessing thread maybe got deadlocked");
                 return false; // Indicates a timeout occurred
             }
             catch (Exception ex)

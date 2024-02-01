@@ -73,15 +73,17 @@ namespace Comet.Game.World.Threading
                             continue;
 
                         await dynaNpc.CheckFightTimeAsync();
-
+                        //TODO: implement cancelation like: await dynaNpc.CheckFightTimeAsync(cts.Token);
                         if (ranking && m_events.Values.All(x => x.Map?.Identity != dynaNpc.MapIdentity))
                             await dynaNpc.BroadcastRankingAsync();
+                            // TODO: implement cancelation like: await dynaNpc.BroadcastRankingAsync(cts.Token);
                     }
 
                     foreach (var @event in m_events.Values)
                     {
                         if (@event.ToNextTime() && !cts.IsCancellationRequested)
                             await @event.OnTimerAsync();
+                            // TODO: implement cancelation like: await @event.OnTimerAsync(cts.Token);
                     }
 
                     // Process queued actions, considering cancellation token as well.

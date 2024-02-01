@@ -82,7 +82,7 @@ namespace Comet.Game.World.Threading
                 else
                 {
                     // Connection attempt either took longer than 2 seconds or failed.
-                    await Log.WriteLogAsync(LogLevel.Warning, "Failed to connect to the account server within the timeout period.");
+                    await Log.WriteLogAsync(LogLevel.Warning, "BasicProcessing thread maybe got deadlocked");
                     // Consider handling the timeout or failure case here.
                 }
             }
