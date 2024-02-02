@@ -74,14 +74,14 @@ namespace Comet.Game.World.Threading
                 await Log.WriteLogAsync(LogLevel.Info, $"Attempting to connect to account server at {AccountClient.Configuration.IPAddress}:{AccountClient.Configuration.Port}");
 
                 var connectTask = Kernel.AccountClient.ConnectToAsync(AccountClient.Configuration.IPAddress, AccountClient.Configuration.Port);
-                if (await Task.WhenAny(connectTask, Task.Delay(2000)) == connectTask && await connectTask)
+                if (await Task.WhenAny(connectTask, Task.Delay(10000)) == connectTask && await connectTask)
                 {
-                    // Connection attempt finished within 2 seconds and was successful.
+                    // Connection attempt finished within 10 seconds and was successful.
                     await Log.WriteLogAsync(LogLevel.Info, "Connected to the account server!");
                 }
                 else
                 {
-                    // Connection attempt either took longer than 2 seconds or failed.
+                    // Connection attempt either took longer than 10 seconds or failed.
                     await Log.WriteLogAsync(LogLevel.Warning, "BasicProcessing thread maybe got deadlocked");
                     // Consider handling the timeout or failure case here.
                 }
