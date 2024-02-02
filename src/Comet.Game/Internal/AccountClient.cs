@@ -25,7 +25,9 @@ namespace Comet.Game.Internal
 
         protected override async Task<AccountServer> ConnectedAsync(Socket socket, Memory<byte> buffer)
         {
-            AccountServer client = new (socket, buffer, 0);
+            AccountServer client = new(socket, buffer, 0);
+            await Log.WriteLogAsync(LogLevel.Debug, $"Account server connected from [{client?.IPAddress}].");
+
             if (socket.Connected)
             {
                 Kernel.AccountServer = client;

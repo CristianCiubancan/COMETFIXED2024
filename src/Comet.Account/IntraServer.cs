@@ -63,6 +63,7 @@ namespace Comet.Account
         /// <param name="packet">An individual data packet to be processed</param>
         private async Task ProcessAsync(GameServer actor, byte[] packet)
         {
+            await Log.WriteLogAsync(LogLevel.Debug, $"Processing packet from server [{actor.IPAddress}].");
             // Validate connection
             if (!actor.Socket.Connected)
                 return;
@@ -134,7 +135,7 @@ namespace Comet.Account
             foreach (var player in Kernel.Players.Values.Where(x => x.Realm.RealmID == actor.Realm.RealmID))
                 Kernel.Players.TryRemove(player.AccountIdentity, out _);
 
-            actor.Realm.Server = null;            
+            actor.Realm.Server = null;
         }
     }
 }
