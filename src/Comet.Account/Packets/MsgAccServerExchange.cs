@@ -13,6 +13,7 @@ namespace Comet.Account.Packets
     {
         public override async Task ProcessAsync(GameServer client)
         {
+            await Log.WriteLogAsync(LogLevel.Info, $"Received connection request from {client.IPAddress} for realm {ServerName}");
             DbRealm realm = Kernel.Realms.Values.FirstOrDefault(x => x.Name.Equals(ServerName, StringComparison.InvariantCultureIgnoreCase));
 
             if (realm == null)
