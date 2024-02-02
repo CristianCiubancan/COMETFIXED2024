@@ -62,8 +62,9 @@ namespace Comet.Network.Packets
             Func<TClient, byte[], Task> process,
             int count = 0)
         {
+
             // Initialize the channels and tasks as parallel arrays
-            count = Math.Max(1, count == 0 ? Environment.ProcessorCount / 2 : count);
+            count = Math.Max(1, count == 0 ? Environment.ProcessorCount : count);
             BackgroundTasks = new Task[count];
             CancelReads = new CancellationToken();
             CancelWrites = new CancellationToken();
@@ -81,7 +82,7 @@ namespace Comet.Network.Packets
         {
             for (int i = 0; i < BackgroundTasks.Length; i++)
             {
-                Partitions[i] = new Partition {ID = (uint) i};
+                Partitions[i] = new Partition { ID = (uint)i };
                 Channels[i] = Channel.CreateUnbounded<Message>();
                 BackgroundTasks[i] = DequeueAsync(Channels[i]);
             }

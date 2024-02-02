@@ -167,7 +167,7 @@ namespace Comet.Game
             await SystemThread.CloseAsync();
             for (int i = 0; i < 5; i++)
             {
-                await Log.WriteLogAsync(LogLevel.Info, $"Server will shutdown in {5-i} seconds...");
+                await Log.WriteLogAsync(LogLevel.Info, $"Server will shutdown in {5 - i} seconds...");
                 await Task.Delay(1000);
             }
             return true;
@@ -177,7 +177,7 @@ namespace Comet.Game
         public static class Services
         {
             public static RandomnessService Randomness = new RandomnessService();
-            public static ServerProcessor Processor = new ServerProcessor(Environment.ProcessorCount / 2);
+            public static ServerProcessor Processor = new ServerProcessor(Environment.ProcessorCount);
         }
 
         public static async Task<bool> ChanceCalcAsync(int chance, int outOf)

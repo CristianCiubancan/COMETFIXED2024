@@ -42,7 +42,7 @@ namespace Comet.Network.Sockets
             {
                 await Socket.ConnectAsync(address, port, ShutdownToken.Token);
                 var actor = await ConnectedAsync(Socket, Buffer);
-                ReceiveTask = (new TaskFactory().StartNew(ReceivingAsync, actor, ShutdownToken.Token)).ConfigureAwait(false);
+                ReceiveTask = new TaskFactory().StartNew(ReceivingAsync, actor, ShutdownToken.Token).ConfigureAwait(false);
                 return Socket.Connected;
             }
             catch
