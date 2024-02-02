@@ -30,6 +30,7 @@ namespace Comet.Game.Internal
 
             if (socket.Connected)
             {
+                await Log.WriteLogAsync(LogLevel.Debug, $"Socket is connected, initializing account server communication.");
                 Kernel.AccountServer = client;
                 Kernel.AccountClient = this;
 
@@ -39,6 +40,7 @@ namespace Comet.Game.Internal
                     Username = Kernel.Configuration.Username,
                     Password = Kernel.Configuration.Password
                 });
+                await Log.WriteLogAsync(LogLevel.Warning, $"[AccountClient] Connected to account server {Kernel.Configuration.ServerName}.");
             }
             return client;
         }
