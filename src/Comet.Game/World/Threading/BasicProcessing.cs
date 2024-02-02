@@ -68,24 +68,26 @@ namespace Comet.Game.World.Threading
 
             if (Kernel.AccountClient == null && m_accountPing.ToNextTime())
             {
-                // Kernel.AccountClient = new AccountClient();
-                // await Log.WriteLogAsync(LogLevel.Info, $"Attempting connection to the account server... {AccountClient.Configuration.IPAddress}:{AccountClient.Configuration.Port}");
-                // if (await Kernel.AccountClient.ConnectToAsync(AccountClient.Configuration.IPAddress, AccountClient.Configuration.Port))
-                // {
-                //     await Log.WriteLogAsync(LogLevel.Info, "Connected to the account server!");
-                // }
-                var connectTask = Kernel.AccountClient.ConnectToAsync(AccountClient.Configuration.IPAddress, AccountClient.Configuration.Port);
-                if (await Task.WhenAny(connectTask, Task.Delay(2000)) == connectTask && await connectTask)
+                // await Log.WriteLogAsync(LogLevel.Info, "Attempting connection with the account server...");
+
+                Kernel.AccountClient = new AccountClient();
+                await Log.WriteLogAsync(LogLevel.Info, $"Attempting connection to the account server... {AccountClient.Configuration.IPAddress}:{AccountClient.Configuration.Port}");
+                if (await Kernel.AccountClient.ConnectToAsync(AccountClient.Configuration.IPAddress, AccountClient.Configuration.Port))
                 {
-                    // Connection attempt finished within 60 seconds and was successful.
                     await Log.WriteLogAsync(LogLevel.Info, "Connected to the account server!");
                 }
-                else
-                {
-                    // Connection attempt either took longer than 60 seconds or failed.
-                    await Log.WriteLogAsync(LogLevel.Warning, "BasicProcessing thread maybe got deadlocked or wrong configuration.");
-                    // Consider handling the timeout or failure case here.
-                }
+
+                // if (await Task.WhenAny(connectTask, Task.Delay(60000)) == connectTask && await connectTask)
+                // {
+                //     // Connection attempt finished within 60 seconds and was successful.
+                //     await Log.WriteLogAsync(LogLevel.Info, "Connected to the account server!");
+                // }
+                // else
+                // {
+                //     // Connection attempt either took longer than 60 seconds or failed.
+                //     await Log.WriteLogAsync(LogLevel.Warning, "BasicProcessing thread maybe got deadlocked");
+                //     // Consider handling the timeout or failure case here.
+                // }
             }
 
             return true;
