@@ -29,7 +29,7 @@ services:
     image: mariadb
     restart: always
     environment:
-      MARIADB_ROOT_PASSWORD: x7#r%^s2!wxXsw$%s223@rq
+      MARIADB_ROOT_PASSWORD: 970E95B5FFEEE7C32ACF1FAFD7EB3665F2CEDBDF
     networks:
       - backend
     volumes:
