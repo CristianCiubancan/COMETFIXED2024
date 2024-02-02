@@ -38,7 +38,7 @@ namespace Comet.Game.World
 {
     public class ServerProcessor : BackgroundService
     {
-        public static Boolean isMultiThreaded = (Environment.ProcessorCount / 2) >= 3;
+        public static Boolean isMultiThreaded = (Environment.ProcessorCount / 2) >= 6;
         public static int NO_MAP_GROUP = isMultiThreaded ? 0 : 0;
         public static int PVP_MAP_GROUP = isMultiThreaded ? 1 : 0;
         public static int NORMAL_MAP_GROUP = isMultiThreaded ? 2 : 0;
@@ -52,8 +52,14 @@ namespace Comet.Game.World
 
         public ServerProcessor(int processorCount)
         {
-            Count = Math.Max(1, processorCount);
-
+            if (processorCount >= 6)
+            {
+                Count = Math.Max(1, processorCount);
+            }
+            else
+            {
+                Count = 1;
+            }
             m_BackgroundTasks = new Task[Count];
             m_Channels = new Channel<Func<Task>>[Count];
             m_Partitions = new Partition[Count];
@@ -80,7 +86,7 @@ namespace Comet.Game.World
                 m_Channels[partition].Writer.TryWrite(task);
             }
         }
-        
+
         protected virtual async Task DequeueAsync(int partition, Channel<Func<Task>> channel)
         {
             while (!m_CancelReads.IsCancellationRequested)
@@ -92,7 +98,7 @@ namespace Comet.Game.World
                     {
                         await action.Invoke(); //.ConfigureAwait(true); // THE QUEUE MUST BE EXECUTED IN ORDER, NO CONCURRENCY
                     }
-                    catch (Exception ex) 
+                    catch (Exception ex)
                     {
                         await Log.WriteLogAsync(LogLevel.Exception, $"{ex.Message}\r\n\t{ex}");
                     }
@@ -123,7 +129,7 @@ namespace Comet.Game.World
         /// </summary>
         public uint SelectPartition()
         {
-            if (Count >= 3)
+            if (Count < 6)
             {
                 uint partition = m_Partitions.Where(x => x.ID >= NORMAL_MAP_GROUP).Aggregate((aggr, next) =>
                                                                             next.Weight.CompareTo(aggr.Weight) < 0
