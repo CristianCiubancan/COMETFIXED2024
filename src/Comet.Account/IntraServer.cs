@@ -63,7 +63,6 @@ namespace Comet.Account
         /// <param name="packet">An individual data packet to be processed</param>
         private async Task ProcessAsync(GameServer actor, byte[] packet)
         {
-            await Log.WriteLogAsync(LogLevel.Debug, $"Processing packet from server [{actor.IPAddress}].");
             // Validate connection
             if (!actor.Socket.Connected)
                 return;

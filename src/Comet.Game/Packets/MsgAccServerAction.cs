@@ -14,8 +14,6 @@ namespace Comet.Game.Packets
                 case ServerAction.ConnectionResult:
                     {
                         ConnectionStatus status = (ConnectionStatus)Data;
-                        await Log.WriteLogAsync(LogLevel.Info, $"The status is : {status}");
-
                         if (status.Equals(ConnectionStatus.Success))
                         {
                             await Log.WriteLogAsync(LogLevel.Info, "Authenticated successfully with the realm server.");
