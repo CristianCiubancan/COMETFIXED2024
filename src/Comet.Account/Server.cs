@@ -56,7 +56,7 @@ namespace Comet.Account
         {
             Processor = new PacketProcessor<Client>(ProcessAsync);
             // not needed in single thread mode
-            // Processor.StartAsync(CancellationToken.None).ConfigureAwait(false);
+            Processor.StartAsync(CancellationToken.None).ConfigureAwait(false);
         }
 
         /// <summary>
