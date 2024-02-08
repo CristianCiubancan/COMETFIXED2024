@@ -3,49 +3,40 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Comet.Network.Sockets;
+using Microsoft.Extensions.Hosting;
 
 namespace Comet.Network.Packets
 {
-    public class PacketProcessor<TClient> where TClient : TcpServerActor
+public class PacketProcessor<TClient> : BackgroundService where TClient : TcpServerActor
+{
+    private readonly Channel<Message> _channel;
+    private readonly Func<TClient, byte[], Task> _processPacketAsync;
+
+    public PacketProcessor(Func<TClient, byte[], Task> processPacketAsync)
     {
-        private readonly Channel<Message> _channel;
-        private readonly Func<TClient, byte[], Task> _processPacketAsync;
-        private CancellationTokenSource _cts;
+        _channel = Channel.CreateUnbounded<Message>();
+        _processPacketAsync = processPacketAsync;
+    }
 
-        public PacketProcessor(Func<TClient, byte[], Task> processPacketAsync)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        await foreach (var message in _channel.Reader.ReadAllAsync(stoppingToken))
         {
-            _channel = Channel.CreateUnbounded<Message>();
-            _processPacketAsync = processPacketAsync;
-            _cts = new CancellationTokenSource();
-        }
-
-        public async Task StartAsync()
-        {
-            await foreach (var message in _channel.Reader.ReadAllAsync(_cts.Token))
-            {
-                await _processPacketAsync(message.Actor, message.Packet);
-            }
-        }
-
-        public void Queue(TClient actor, byte[] packet)
-        {
-            if (!_channel.Writer.TryWrite(new Message { Actor = actor, Packet = packet }))
-            {
-                Console.WriteLine("Failed to queue packet.");
-            }
-        }
-
-        public void Stop()
-        {
-            _cts.Cancel();
-        }
-
-        private class Message
-        {
-            public TClient Actor;
-            public byte[] Packet;
+            await _processPacketAsync(message.Actor, message.Packet);
         }
     }
+
+    public void Queue(TClient actor, byte[] packet)
+    {
+        _channel.Writer.TryWrite(new Message { Actor = actor, Packet = packet });
+    }
+
+    private class Message
+    {
+        public TClient Actor;
+        public byte[] Packet;
+    }
+}
 }
 
 // // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
