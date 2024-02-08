@@ -1,4 +1,5 @@
-﻿// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+﻿
+// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (C) FTW! Masters
 // Keep the headers and the patterns adopted by the project. If you changed anything in the file just insert
 // your name below, but don't remove the names of who worked here before.
@@ -22,6 +23,7 @@
 #region References
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -36,137 +38,192 @@ using Microsoft.Extensions.Hosting;
 
 namespace Comet.Game.World
 {
-    public class ServerProcessor : BackgroundService
-    {
-        public static Boolean isMultiThreaded = (Environment.ProcessorCount / 2) >= 3;
-        public static int NO_MAP_GROUP = isMultiThreaded ? 0 : 0;
-        public static int PVP_MAP_GROUP = isMultiThreaded ? 1 : Environment.ProcessorCount >= 2 ? 1 : 0;
-        public static int NORMAL_MAP_GROUP = isMultiThreaded ? 2 : Environment.ProcessorCount >= 2 ? 1 : 0;
-        protected readonly Task[] m_BackgroundTasks;
-        protected readonly Channel<Func<Task>>[] m_Channels;
-        protected readonly Partition[] m_Partitions;
-        protected CancellationToken m_CancelReads;
-        protected CancellationToken m_CancelWrites;
+    
+    public class ServerProcessor {
 
-        public readonly int Count;
+    private Queue<Func<Task>> m_taskQueue = new(); 
+    private CancellationTokenSource m_cancellationTokenSource;
 
-        public ServerProcessor(int processorCount)
-        {
-            if (processorCount >= 6)
-            {
-                Count = Math.Max(1, processorCount);
+    public ServerProcessor() {
+        m_cancellationTokenSource = new CancellationTokenSource();
+    }
+
+    public void Queue(Func<Task> task) {
+        if (!m_cancellationTokenSource.Token.IsCancellationRequested) {
+            lock(m_taskQueue) {
+                m_taskQueue.Enqueue(task);
             }
-            else
-            {
-                Count = Environment.ProcessorCount >= 2 ? 2 : 1;
-            }
-            m_BackgroundTasks = new Task[Count];
-            m_Channels = new Channel<Func<Task>>[Count];
-            m_Partitions = new Partition[Count];
-            m_CancelReads = new CancellationToken();
-            m_CancelWrites = new CancellationToken();
-        }
-
-        protected override Task ExecuteAsync(CancellationToken token)
-        {
-            for (int i = 0; i < Count; i++)
-            {
-                m_Partitions[i] = new Partition { ID = (uint)i, Weight = 0 };
-                m_Channels[i] = Channel.CreateUnbounded<Func<Task>>();
-                m_BackgroundTasks[i] = DequeueAsync(i, m_Channels[i]);
-            }
-
-            return Task.WhenAll(m_BackgroundTasks);
-        }
-
-        public void Queue(int partition, Func<Task> task)
-        {
-            if (!m_CancelWrites.IsCancellationRequested)
-            {
-                m_Channels[partition].Writer.TryWrite(task);
-            }
-        }
-
-        protected virtual async Task DequeueAsync(int partition, Channel<Func<Task>> channel)
-        {
-            while (!m_CancelReads.IsCancellationRequested)
-            {
-                var action = await channel.Reader.ReadAsync(m_CancelReads);
-                if (action != null)
-                {
-                    try
-                    {
-                        await action.Invoke(); //.ConfigureAwait(true); // THE QUEUE MUST BE EXECUTED IN ORDER, NO CONCURRENCY
-                    }
-                    catch (Exception ex)
-                    {
-                        await Log.WriteLogAsync(LogLevel.Exception, $"{ex.Message}\r\n\t{ex}");
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        ///     Triggered when the application host is stopping the background task with a
-        ///     graceful shutdown. Requests that writes into the channel stop, and then reads
-        ///     from the channel stop.
-        /// </summary>
-        public new async Task StopAsync(CancellationToken cancellationToken)
-        {
-            m_CancelWrites = new CancellationToken(true);
-            foreach (var channel in m_Channels)
-            {
-                if (channel.Reader.Count > 0)
-                    await channel.Reader.Completion;
-            }
-            m_CancelReads = new CancellationToken(true);
-        }
-
-        /// <summary>
-        ///     Selects a partition for the client actor based on partition weight. The
-        ///     partition with the least popluation will be chosen first. After selecting a
-        ///     partition, that partition's weight will be increased by one.
-        /// </summary>
-        public uint SelectPartition()
-        {
-            if (Count < 6)
-            {
-                uint partition = m_Partitions.Where(x => x.ID >= NORMAL_MAP_GROUP).Aggregate((aggr, next) =>
-                                                                            next.Weight.CompareTo(aggr.Weight) < 0
-                                                                                ? next
-                                                                                : aggr).ID;
-                Interlocked.Increment(ref m_Partitions[partition].Weight);
-                return partition;
-            }
-            else
-            {
-                // in case of more than 3 partitions, select a random partition from the partitions with minimum weight
-                var minWeight = m_Partitions.Min(p => p.Weight);
-                var partitions = m_Partitions.Where(p => p.Weight == minWeight).ToList();
-                var random = new Random();
-                uint partition = partitions[random.Next(partitions.Count)].ID;
-                Interlocked.Increment(ref m_Partitions[partition].Weight);
-                return partition;
-            }
-        }
-
-        public void SelectPartition(uint partition)
-        {
-            Interlocked.Increment(ref m_Partitions[partition].Weight);
-        }
-        /// <summary>
-        ///     Deslects a partition after the client actor disconnects.
-        /// </summary>
-        /// <param name="partition">The partition id to reduce the weight of</param>
-        public void DeselectPartition(uint partition)
-        {
-            Interlocked.Decrement(ref m_Partitions[partition].Weight);
-        }
-
-        protected class Partition
-        {
-            public uint ID;
-            public int Weight;
         }
     }
+
+    public async Task ExecuteAsync() {
+        while (!m_cancellationTokenSource.Token.IsCancellationRequested) {
+            Func<Task> task;
+            
+            lock(m_taskQueue) {
+                if (m_taskQueue.Count > 0) {
+                    task = m_taskQueue.Dequeue();
+                }
+                else {
+                    continue; 
+                }
+            }
+            
+            try {
+                await task(); 
+            }
+            catch {
+                // log errors
+            }
+        }
+    }
+
+    public void Stop() {
+        m_cancellationTokenSource.Cancel();
+    }
+
+    public async Task StartAsync() {
+    // Potentially start task execution here
+    await ExecuteAsync(); // If you want to start processing tasks immediately
+}
+
+    public async void StopAsync() {
+        Stop(); // You already have a Stop method that cancels the token
+    }
+
+}
+    // public class ServerProcessor : BackgroundService
+    // {
+    //     public static Boolean isMultiThreaded = (Environment.ProcessorCount / 2) >= 3;
+    //     public static int NO_MAP_GROUP = isMultiThreaded ? 0 : 0;
+    //     public static int PVP_MAP_GROUP = isMultiThreaded ? 1 : Environment.ProcessorCount >= 2 ? 1 : 0;
+    //     public static int NORMAL_MAP_GROUP = isMultiThreaded ? 2 : Environment.ProcessorCount >= 2 ? 1 : 0;
+    //     protected readonly Task[] m_BackgroundTasks;
+    //     protected readonly Channel<Func<Task>>[] m_Channels;
+    //     protected readonly Partition[] m_Partitions;
+    //     protected CancellationToken m_CancelReads;
+    //     protected CancellationToken m_CancelWrites;
+
+    //     public readonly int Count;
+
+    //     public ServerProcessor(int processorCount)
+    //     {
+    //         if (processorCount >= 6)
+    //         {
+    //             Count = Math.Max(1, processorCount);
+    //         }
+    //         else
+    //         {
+    //             Count = Environment.ProcessorCount >= 2 ? 2 : 1;
+    //         }
+    //         m_BackgroundTasks = new Task[Count];
+    //         m_Channels = new Channel<Func<Task>>[Count];
+    //         m_Partitions = new Partition[Count];
+    //         m_CancelReads = new CancellationToken();
+    //         m_CancelWrites = new CancellationToken();
+    //     }
+
+    //     protected override Task ExecuteAsync(CancellationToken token)
+    //     {
+    //         for (int i = 0; i < Count; i++)
+    //         {
+    //             m_Partitions[i] = new Partition { ID = (uint)i, Weight = 0 };
+    //             m_Channels[i] = Channel.CreateUnbounded<Func<Task>>();
+    //             m_BackgroundTasks[i] = DequeueAsync(i, m_Channels[i]);
+    //         }
+
+    //         return Task.WhenAll(m_BackgroundTasks);
+    //     }
+
+    //     public void Queue(int partition, Func<Task> task)
+    //     {
+    //         if (!m_CancelWrites.IsCancellationRequested)
+    //         {
+    //             m_Channels[partition].Writer.TryWrite(task);
+    //         }
+    //     }
+
+    //     protected virtual async Task DequeueAsync(int partition, Channel<Func<Task>> channel)
+    //     {
+    //         while (!m_CancelReads.IsCancellationRequested)
+    //         {
+    //             var action = await channel.Reader.ReadAsync(m_CancelReads);
+    //             if (action != null)
+    //             {
+    //                 try
+    //                 {
+    //                     await action.Invoke(); //.ConfigureAwait(true); // THE QUEUE MUST BE EXECUTED IN ORDER, NO CONCURRENCY
+    //                 }
+    //                 catch (Exception ex)
+    //                 {
+    //                     await Log.WriteLogAsync(LogLevel.Exception, $"{ex.Message}\r\n\t{ex}");
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     /// <summary>
+    //     ///     Triggered when the application host is stopping the background task with a
+    //     ///     graceful shutdown. Requests that writes into the channel stop, and then reads
+    //     ///     from the channel stop.
+    //     /// </summary>
+    //     public new async Task StopAsync(CancellationToken cancellationToken)
+    //     {
+    //         m_CancelWrites = new CancellationToken(true);
+    //         foreach (var channel in m_Channels)
+    //         {
+    //             if (channel.Reader.Count > 0)
+    //                 await channel.Reader.Completion;
+    //         }
+    //         m_CancelReads = new CancellationToken(true);
+    //     }
+
+    //     /// <summary>
+    //     ///     Selects a partition for the client actor based on partition weight. The
+    //     ///     partition with the least popluation will be chosen first. After selecting a
+    //     ///     partition, that partition's weight will be increased by one.
+    //     /// </summary>
+    //     public uint SelectPartition()
+    //     {
+    //         if (Count < 6)
+    //         {
+    //             uint partition = m_Partitions.Where(x => x.ID >= NORMAL_MAP_GROUP).Aggregate((aggr, next) =>
+    //                                                                         next.Weight.CompareTo(aggr.Weight) < 0
+    //                                                                             ? next
+    //                                                                             : aggr).ID;
+    //             Interlocked.Increment(ref m_Partitions[partition].Weight);
+    //             return partition;
+    //         }
+    //         else
+    //         {
+    //             // in case of more than 3 partitions, select a random partition from the partitions with minimum weight
+    //             var minWeight = m_Partitions.Min(p => p.Weight);
+    //             var partitions = m_Partitions.Where(p => p.Weight == minWeight).ToList();
+    //             var random = new Random();
+    //             uint partition = partitions[random.Next(partitions.Count)].ID;
+    //             Interlocked.Increment(ref m_Partitions[partition].Weight);
+    //             return partition;
+    //         }
+    //     }
+
+    //     public void SelectPartition(uint partition)
+    //     {
+    //         Interlocked.Increment(ref m_Partitions[partition].Weight);
+    //     }
+    //     /// <summary>
+    //     ///     Deslects a partition after the client actor disconnects.
+    //     /// </summary>
+    //     /// <param name="partition">The partition id to reduce the weight of</param>
+    //     public void DeselectPartition(uint partition)
+    //     {
+    //         Interlocked.Decrement(ref m_Partitions[partition].Weight);
+    //     }
+
+    //     protected class Partition
+    //     {
+    //         public uint ID;
+    //         public int Weight;
+    //     }
+    // }
+
 }

@@ -1373,7 +1373,7 @@ namespace Comet.Game.States
                 }
                 else
                 {
-                    Kernel.Services.Processor.Queue(map.Partition, () => mapItem.EnterMapAsync());
+                    Kernel.Services.Processor.Queue(() => mapItem.EnterMapAsync());
                 }
             }
             else
@@ -1654,7 +1654,7 @@ namespace Comet.Game.States
                 }
                 else
                 {
-                    Kernel.Services.Processor.Queue(map.Partition, () => mapItem.EnterMapAsync());
+                    Kernel.Services.Processor.Queue(() => mapItem.EnterMapAsync());
                 }
             }
 
@@ -6357,7 +6357,7 @@ namespace Comet.Game.States
             }
             else
             {
-                Kernel.Services.Processor.Queue(map.Partition, gameActionCreateNpcTask);
+                Kernel.Services.Processor.Queue(gameActionCreateNpcTask);
             }
             return true;
         }

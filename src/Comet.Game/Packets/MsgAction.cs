@@ -203,7 +203,7 @@ namespace Comet.Game.Packets
 
                     }
 
-                    Kernel.Services.Processor.Queue(targetMap.Partition, enterMapPartitionTask); // sends the current player from Partition 0 the proper partition
+                    Kernel.Services.Processor.Queue(enterMapPartitionTask); // sends the current player from Partition 0 the proper partition
                     break;
 
                 case ActionType.LoginInventory: // 75

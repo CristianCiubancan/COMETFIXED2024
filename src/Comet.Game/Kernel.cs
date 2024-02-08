@@ -160,7 +160,8 @@ namespace Comet.Game
             await EventThread.CloseAsync();
             await GeneratorThread.CloseAsync();
 
-            await Services.Processor.StopAsync(new CancellationToken(true)).ConfigureAwait(true);
+            // await Services.Processor.StopAsync(new CancellationToken(true)).ConfigureAwait(true);
+            // Services.Processor.StopAsync();
 
             await RoleManager.KickOutAllAsync("Server is now closing", true).ConfigureAwait(true);
 
@@ -177,7 +178,7 @@ namespace Comet.Game
         public static class Services
         {
             public static RandomnessService Randomness = new RandomnessService();
-            public static ServerProcessor Processor = new ServerProcessor(Environment.ProcessorCount);
+            public static ServerProcessor Processor = new ServerProcessor();
         }
 
         public static async Task<bool> ChanceCalcAsync(int chance, int outOf)

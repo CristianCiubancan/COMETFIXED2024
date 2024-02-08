@@ -394,7 +394,7 @@ namespace Comet.Game
                             await Kernel.RoleManager.KickOutAsync(actor.Identity);
                         return;
                     }
-                    Kernel.Services.Processor.Queue(actor.Character.Map.Partition, () => msg.ProcessAsync(actor));
+                    Kernel.Services.Processor.Queue(() => msg.ProcessAsync(actor));
                 }
                 else
                 {
@@ -405,7 +405,7 @@ namespace Comet.Game
                         || type == PacketType.MsgRank
                         || (msg is MsgAction action && action.Action != MsgAction.ActionType.MapJump))
                     {
-                        Kernel.Services.Processor.Queue(ServerProcessor.NO_MAP_GROUP, () => msg.ProcessAsync(actor));
+                        Kernel.Services.Processor.Queue(() => msg.ProcessAsync(actor));
                     }
                     else
                     {
@@ -447,7 +447,7 @@ namespace Comet.Game
                 Log.WriteLogAsync(LogLevel.Info, $"{actor.Character.Name} has logged out.").ConfigureAwait(false);
                 actor.Character.Connection = Character.ConnectionStage.Disconnected;
 
-                Kernel.Services.Processor.Queue(ServerProcessor.NO_MAP_GROUP, async () =>
+                Kernel.Services.Processor.Queue(async () =>
                 {
                     Kernel.RoleManager.ForceLogoutUser(actor.Character.Identity);
                     await actor.Character.OnDisconnectAsync();

@@ -171,7 +171,7 @@ namespace Comet.Game.World
             {
                 while (generate-- > 0)
                 {
-                    Kernel.Services.Processor.Queue(m_pMap.Partition, async () =>
+                    Kernel.Services.Processor.Queue(async () =>
                     {
                         Monster monster = await GenerateMonsterAsync();
                         if (monster == null || !m_dicMonsters.TryAdd(monster.Identity, monster))

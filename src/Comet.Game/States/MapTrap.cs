@@ -138,7 +138,7 @@ namespace Comet.Game.States
 
             if (Map != null)
             {
-                Kernel.Services.Processor.Queue(Map.Partition, async () =>
+                Kernel.Services.Processor.Queue(async () =>
                 {
                     await Map.RemoveAsync(Identity);
                 });

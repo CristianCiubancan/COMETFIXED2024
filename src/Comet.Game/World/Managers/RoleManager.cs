@@ -331,7 +331,7 @@ namespace Comet.Game.World.Managers
             {
                 if (item.CanDisappear())
                 {
-                    Kernel.Services.Processor.Queue(item.Map.Partition, async () =>
+                    Kernel.Services.Processor.Queue(async () =>
                     {
                         await item.DisappearAsync();
                         m_mapItemSet.TryRemove(item.Identity, out _);

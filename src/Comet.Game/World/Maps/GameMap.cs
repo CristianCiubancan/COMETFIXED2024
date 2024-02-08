@@ -207,12 +207,11 @@ namespace Comet.Game.World.Maps
 
             if (IsSynMap() || IsFamilyMap() || IsPkField())
             {
-                Partition = ServerProcessor.PVP_MAP_GROUP;
-                Kernel.Services.Processor.SelectPartition((uint)Partition);
+                Partition = 0;
             }
             else
             {
-                Partition = (int)Kernel.Services.Processor.SelectPartition();
+                Partition = 0;
             }            return true;
         }
 
