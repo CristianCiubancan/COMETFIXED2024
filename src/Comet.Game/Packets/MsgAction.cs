@@ -202,7 +202,6 @@ namespace Comet.Game.Packets
                         user.Connection = Character.ConnectionStage.Ready; // set user ready to be processed.
 
                     }
-
                     Kernel.Services.Processor.Queue(targetMap.Partition, enterMapPartitionTask); // sends the current player from Partition 0 the proper partition
                     break;
 
