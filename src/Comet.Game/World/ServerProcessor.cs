@@ -20,6 +20,7 @@ namespace Comet.Game.World
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            await Log.WriteLogAsync(LogLevel.Warning, "ServerProcessor is ExecuteAsync.");
             // Combine the provided stopping token with the internal cancellation token source
             // to ensure that we can stop the loop from both internal and external requests.
             var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, _cts.Token);
@@ -48,6 +49,7 @@ namespace Comet.Game.World
 
         public void Queue(Func<Task> task)
         {
+            Log.WriteLogAsync(LogLevel.Warning, "ServerProcessor is Queue.").ConfigureAwait(false);
             if (!_cts.IsCancellationRequested)
             {
                 _channel.Writer.TryWrite(task);
@@ -56,6 +58,7 @@ namespace Comet.Game.World
 
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
+            await Log.WriteLogAsync(LogLevel.Warning, "ServerProcessor is StopAsync.").ConfigureAwait(false);
             _cts.Cancel();
             await base.StopAsync(cancellationToken);
         }

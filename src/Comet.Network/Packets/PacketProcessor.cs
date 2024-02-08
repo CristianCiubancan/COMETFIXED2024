@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Comet.Network.Sockets;
+using Comet.Shared;
 using Microsoft.Extensions.Hosting;
 
 namespace Comet.Network.Packets
@@ -20,6 +21,7 @@ public class PacketProcessor<TClient> : BackgroundService where TClient : TcpSer
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await Log.WriteLogAsync(LogLevel.Info, "PacketProcessor ExecuteAsync.");
         await foreach (var message in _channel.Reader.ReadAllAsync(stoppingToken))
         {
             await _processPacketAsync(message.Actor, message.Packet);
@@ -28,6 +30,7 @@ public class PacketProcessor<TClient> : BackgroundService where TClient : TcpSer
 
     public void Queue(TClient actor, byte[] packet)
     {
+        Log.WriteLogAsync(LogLevel.Info, "PacketProcessor Queue.").ConfigureAwait(false);
         _channel.Writer.TryWrite(new Message { Actor = actor, Packet = packet });
     }
 
