@@ -40,8 +40,8 @@ namespace Comet.Game.World
     {
         public static Boolean isMultiThreaded = (Environment.ProcessorCount / 2) >= 3;
         public static int NO_MAP_GROUP = isMultiThreaded ? 0 : 0;
-        public static int PVP_MAP_GROUP = isMultiThreaded ? 1 : 0;
-        public static int NORMAL_MAP_GROUP = isMultiThreaded ? 2 : 0;
+        public static int PVP_MAP_GROUP = isMultiThreaded ? 1 : 1;
+        public static int NORMAL_MAP_GROUP = isMultiThreaded ? 2 : 1;
         protected readonly Task[] m_BackgroundTasks;
         protected readonly Channel<Func<Task>>[] m_Channels;
         protected readonly Partition[] m_Partitions;
