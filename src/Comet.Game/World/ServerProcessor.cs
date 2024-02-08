@@ -58,7 +58,7 @@ namespace Comet.Game.World
             }
             else
             {
-                Count = 1;
+                Count = Environment.ProcessorCount >= 2 ? 2 : 1;
             }
             m_BackgroundTasks = new Task[Count];
             m_Channels = new Channel<Func<Task>>[Count];
