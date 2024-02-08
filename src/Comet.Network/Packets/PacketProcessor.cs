@@ -64,7 +64,7 @@ namespace Comet.Network.Packets
         {
 
             // Initialize the channels and tasks as parallel arrays
-            count = Math.Max(1, count == 0 ? Environment.ProcessorCount / 2 : count);
+            count = Math.Max(1, count == 0 ?Environment.ProcessorCount < 6 && Environment.ProcessorCount >= 2 ? Environment.ProcessorCount / 2 : Environment.ProcessorCount : count);
             BackgroundTasks = new Task[count];
             CancelReads = new CancellationToken();
             CancelWrites = new CancellationToken();
