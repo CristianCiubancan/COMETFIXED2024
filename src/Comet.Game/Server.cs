@@ -59,7 +59,7 @@ namespace Comet.Game
 #if DEBUG
             Processor = new PacketProcessor<Client>(ProcessAsync);
 #else
-            Processor = new PacketProcessor<Client>(ProcessAsync, 2); // ?? not sure if really needed
+            Processor = new PacketProcessor<Client>(ProcessAsync); // ?? not sure if really needed
 #endif
             // no longer needed, as we are using a single thread
             // Processor.StartAsync(CancellationToken.None).ConfigureAwait(false);
