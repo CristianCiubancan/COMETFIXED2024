@@ -22,7 +22,8 @@ namespace Comet.Account
             : base(100, 8192, false, false, "8a653a5d1e92b4e1db79".Length)
         {
             Processor = new PacketProcessor<GameServer>(ProcessAsync);
-            Processor.StartAsync(CancellationToken.None).ConfigureAwait(false);
+            // not needed in single thread mode
+            // Processor.StartAsync(CancellationToken.None).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -35,7 +36,7 @@ namespace Comet.Account
         /// <returns>A new instance of a ServerActor around the client socket</returns>
         protected override async Task<GameServer> AcceptedAsync(Socket socket, Memory<byte> buffer)
         {
-            uint partition = Processor.SelectPartition();
+            uint partition = 0;
             var client = new GameServer(socket, buffer, partition);
             await Log.WriteLogAsync(LogLevel.Info, $"Accepting connection from server on [{client.IPAddress}].");
             return client;

@@ -55,7 +55,8 @@ namespace Comet.Account
         public Server(ServerConfiguration config) : base(config.Network.MaxConn)
         {
             Processor = new PacketProcessor<Client>(ProcessAsync);
-            Processor.StartAsync(CancellationToken.None).ConfigureAwait(false);
+            // not needed in single thread mode
+            // Processor.StartAsync(CancellationToken.None).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -68,7 +69,7 @@ namespace Comet.Account
         /// <returns>A new instance of a ServerActor around the client socket</returns>
         protected override async Task<Client> AcceptedAsync(Socket socket, Memory<byte> buffer)
         {
-            uint partition = this.Processor.SelectPartition();
+            uint partition = 0;
             var client = new Client(socket, buffer, partition)
             {
                 Seed = (uint) (await Kernel.NextAsync(10000, int.MaxValue))

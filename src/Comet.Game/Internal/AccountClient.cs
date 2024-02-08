@@ -20,7 +20,8 @@ namespace Comet.Game.Internal
             : base("8a653a5d1e92b4e1db79".Length)
         {
             Processor = new PacketProcessor<AccountServer>(ProcessAsync);
-            Processor.StartAsync(CancellationToken.None).ConfigureAwait(false);
+            // No longer need in single thread mode
+            // Processor.StartAsync(CancellationToken.None).ConfigureAwait(false);
         }
 
         protected override async Task<AccountServer> ConnectedAsync(Socket socket, Memory<byte> buffer)

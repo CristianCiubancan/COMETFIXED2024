@@ -57,11 +57,12 @@ namespace Comet.Game
         public Server(ServerConfiguration config) : base(config.GameNetwork.MaxConn, 4096, false, true, 8)
         {
 #if DEBUG
-            Processor = new PacketProcessor<Client>(ProcessAsync, 1);
+            Processor = new PacketProcessor<Client>(ProcessAsync);
 #else
             Processor = new PacketProcessor<Client>(ProcessAsync, 2); // ?? not sure if really needed
 #endif
-            Processor.StartAsync(CancellationToken.None).ConfigureAwait(false);
+            // no longer needed, as we are using a single thread
+            // Processor.StartAsync(CancellationToken.None).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -74,7 +75,7 @@ namespace Comet.Game
         /// <returns>A new instance of a ServerActor around the client socket</returns>
         protected override async Task<Client> AcceptedAsync(Socket socket, Memory<byte> buffer)
         {
-            var partition = this.Processor.SelectPartition();
+            uint partition = 0;
             var client = new Client(socket, buffer, partition);
 
             await client.DiffieHellman.ComputePublicKeyAsync();
@@ -433,7 +434,8 @@ namespace Comet.Game
                 return;
             }
 
-            Processor.DeselectPartition(actor.Partition);
+            // TODO: Add code here to handle disconnecting from the server
+            // Processor.DeselectPartition(actor.Partition);
 
             bool fromCreation = false;
             if (actor.Creation != null)
