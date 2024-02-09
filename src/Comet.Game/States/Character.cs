@@ -6092,7 +6092,7 @@ namespace Comet.Game.States
                 }
             }
             // this should not be like this but we wont integrate character regeneration
-            await BaseRepository.ScalarAsync($"DELETE FROM `cq_deluser` WHERE `id`={Identity};");
+            await BaseRepository.ScalarAsync($"DELETE FROM `cq_deluser` WHERE `name`={Name};");
 
             await BaseRepository.ScalarAsync($"INSERT INTO `cq_deluser` SELECT * FROM `cq_user` WHERE `id`={Identity};");
             await BaseRepository.DeleteAsync(m_dbObject);
