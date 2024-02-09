@@ -6091,10 +6091,8 @@ namespace Comet.Game.States
                         return false;
                 }
             }
-            // this should not be like this but we wont integrate character regeneration
-            await BaseRepository.ScalarAsync($"DELETE FROM `cq_deluser` WHERE `name`={Name};");
-
-            await BaseRepository.ScalarAsync($"INSERT INTO `cq_deluser` SELECT * FROM `cq_user` WHERE `id`={Identity};");
+            // TODO: implement character regeneration , we also need to check for deleted names when creating a new char
+            // await BaseRepository.ScalarAsync($"INSERT INTO `cq_deluser` SELECT * FROM `cq_user` WHERE `id`={Identity};");
             await BaseRepository.DeleteAsync(m_dbObject);
             await Log.GmLogAsync("delete_user", $"{Identity},{Name},{MapIdentity},{MapX},{MapY},{Silvers},{ConquerPoints},{Level},{Profession},{FirstProfession},{PreviousProfession}");
 
