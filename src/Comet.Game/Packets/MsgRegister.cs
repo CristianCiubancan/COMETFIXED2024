@@ -213,9 +213,7 @@ namespace Comet.Game.Packets
                 await Log.WriteLogAsync(LogLevel.Exception, $"Exception thrown when generating initial status for user. Msg: {e.Message}");
             }
             await Log.WriteLogAsync(LogLevel.Info, "Character creation starting character creation");
-            // await client.SendAsync(RegisterOk);
-            // TODO: remove this if it does not help
-            client.Disconnect();
+            await client.SendAsync(RegisterOk);
         }
 
         private async Task GenerateInitialEquipmentAsync(DbCharacter user)
