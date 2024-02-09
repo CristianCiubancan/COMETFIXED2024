@@ -96,14 +96,14 @@ namespace Comet.Game.Packets
         public override async Task ProcessAsync(Client client)
         {
             var processTask = ProcessCharacterCreationAsync(client);
-            var delayTask = Task.Delay(2000); // 2 seconds delay
+            var delayTask = Task.Delay(20000); // 2 seconds delay
 
             var completedTask = await Task.WhenAny(processTask, delayTask);
 
             if (completedTask == delayTask)
             {
                 // If the delay task completes first, it means the character creation process is taking too long.
-                await Log.WriteLogAsync(LogLevel.Warning, "Character creation process exceeded 2 seconds.");
+                await Log.WriteLogAsync(LogLevel.Warning, "Character creation process exceeded 20 seconds.");
                 await client.SendAsync(RegisterTryAgain);
                 return; // Optionally disconnect the client or handle accordingly.
             }
