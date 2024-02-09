@@ -354,7 +354,7 @@ namespace Comet.Game.States
             if (await Kernel.ChanceCalcAsync(50, 16500))
             {
                 uint cpsBagType = (uint)await Kernel.NextAsync(729910, 729912);
-                if (user.VipLevel >= 6) {
+                if (user != null && user.VipLevel >= 6) {
                     switch (cpsBagType) {
                         case 729910:
                             await user.AwardConquerPointsAsync(1);
@@ -373,7 +373,7 @@ namespace Comet.Game.States
             } 
             else if (await Kernel.ChanceCalcAsync(625, 54_000_000 / multiplier))
             {
-                if (user.VipLevel >= 6)
+                if (user != null && user.VipLevel >= 6)
                 {
                     // await user.UserPackage.AwardItemAsync(Item.TYPE_DRAGONBALL);
                     // if the user already has 9 dragon balls we want to get rid of them and award a db scroll
