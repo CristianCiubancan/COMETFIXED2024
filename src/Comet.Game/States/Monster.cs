@@ -354,8 +354,22 @@ namespace Comet.Game.States
             if (await Kernel.ChanceCalcAsync(50, 16500))
             {
                 uint cpsBagType = (uint)await Kernel.NextAsync(729910, 729912);
-                await DropItemAsync(cpsBagType, null);
-                await Log.GmLogAsync("emoney_bag", $"{idDropOwner},{cpsBagType},{attacker?.MapIdentity},{attacker?.MapX},{attacker?.MapY},{MapX},{MapY},{Identity}");
+                if (user.VipLevel >= 6) {
+                    switch (cpsBagType) {
+                        case 729910:
+                            await user.AwardConquerPointsAsync(1);
+                            break;
+                        case 729911:
+                            await user.AwardConquerPointsAsync(3);
+                            break;
+                        case 729912:
+                            await user.AwardConquerPointsAsync(6);
+                            break;
+                    }
+                } else {
+                    await DropItemAsync(cpsBagType, null);
+                    await Log.GmLogAsync("emoney_bag", $"{idDropOwner},{cpsBagType},{attacker?.MapIdentity},{attacker?.MapX},{attacker?.MapY},{MapX},{MapY},{Identity}");
+                }
             } 
             else if (await Kernel.ChanceCalcAsync(625, 54_000_000 / multiplier))
             {
