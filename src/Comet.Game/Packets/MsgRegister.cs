@@ -206,9 +206,13 @@ namespace Comet.Game.Packets
                 await Kernel.NextAsync(3, 9) * 100 + Hairstyles[
                     await Kernel.NextAsync(0, Hairstyles.Length)]);
             await Log.WriteLogAsync(LogLevel.Info, "Character creation look validated");
+            
+            await Log.WriteLogAsync(LogLevel.Info, "Character creation delaying for 500 ms");
+            await Task.Delay(500);
+            
             try
             {
-                await Log.WriteLogAsync(LogLevel.Info, "Character creation starting character creation");
+                await Log.WriteLogAsync(LogLevel.Info, "Character creation starting db character creation");
                 // Save the character and continue with login
                 await CharactersRepository.CreateAsync(character);
                 Kernel.Registration.Remove(client.Creation.Token);
@@ -220,10 +224,11 @@ namespace Comet.Game.Packets
                 await client.SendAsync(RegisterTryAgain);
                 return;
             }
-
+            await Log.WriteLogAsync(LogLevel.Info, "Character creation delaying for 500 ms");
+            await Task.Delay(500);
             try
             {
-                await Log.WriteLogAsync(LogLevel.Info, "Character creation starting character creation");
+                await Log.WriteLogAsync(LogLevel.Info, "Character creation generating initial equipment");
                 await GenerateInitialEquipmentAsync(character);
                 await Log.WriteLogAsync(LogLevel.Info, "Character creation generated initial equipment");
             }
@@ -231,7 +236,9 @@ namespace Comet.Game.Packets
             {
                 await Log.WriteLogAsync(LogLevel.Exception, $"Exception thrown when generating initial status for user. Msg: {e.Message}");
             }
-            await Log.WriteLogAsync(LogLevel.Info, "Character creation starting character creation");
+            await Log.WriteLogAsync(LogLevel.Info, "Character creation delaying for 500 ms");
+            await Task.Delay(500);
+            await Log.WriteLogAsync(LogLevel.Info, "Sending character creation confirmation");
             await client.SendAsync(RegisterOk);
         }
 
