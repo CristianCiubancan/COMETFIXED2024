@@ -373,7 +373,7 @@ namespace Comet.Game.States
             } 
             else if (await Kernel.ChanceCalcAsync(625, 54_000_000 / multiplier))
             {
-                if (user != null && user.VipLevel >= 6)
+                if (user != null && user.VipLevel >= 6 && user.UserPackage.InventoryCount < 40)
                 {
                     // await user.UserPackage.AwardItemAsync(Item.TYPE_DRAGONBALL);
                     // if the user already has 9 dragon balls we want to get rid of them and award a db scroll
