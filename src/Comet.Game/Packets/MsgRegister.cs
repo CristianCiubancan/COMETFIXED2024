@@ -94,7 +94,7 @@ namespace Comet.Game.Packets
         /// <param name="client">Client requesting packet processing</param>
         public override async Task ProcessAsync(Client client)
         {
-            await Log.WriteLogAsync(LogLevel.Info, $"Character creation request from {client.Character.Name}");
+            await Log.WriteLogAsync(LogLevel.Info, $"Character creation request from {CharacterName}");
             // Validate that the player has access to character creation
             if (client.Creation == null || Token != client.Creation.Token ||
                 !Kernel.Registration.Contains(Token))
