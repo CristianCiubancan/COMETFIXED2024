@@ -55,8 +55,8 @@ namespace Comet.Game.Packets
             10, 11, 13, 14, 15, 24, 30, 35, 37, 38, 39, 40
         };
 
-        private static readonly ushort[] m_startX = {430, 423, 439, 428, 452, 464, 439};
-        private static readonly ushort[] m_startY = {378, 394, 384, 365, 365, 378, 396};
+        private static readonly ushort[] m_startX = { 430, 423, 439, 428, 452, 464, 439 };
+        private static readonly ushort[] m_startY = { 378, 394, 384, 365, 365, 378, 396 };
 
         // Packet Properties
         public string Username { get; set; }
@@ -76,7 +76,7 @@ namespace Comet.Game.Packets
         {
             var reader = new PacketReader(bytes);
             Length = reader.ReadUInt16();
-            Type = (PacketType) reader.ReadUInt16();
+            Type = (PacketType)reader.ReadUInt16();
             Username = reader.ReadString(16);
             CharacterName = reader.ReadString(16);
             MaskedPassword = reader.ReadString(16);
@@ -92,7 +92,26 @@ namespace Comet.Game.Packets
         ///     <see cref="PacketProcessor{TClient}" />.
         /// </summary>
         /// <param name="client">Client requesting packet processing</param>
+        /// 
         public override async Task ProcessAsync(Client client)
+        {
+            var processTask = ProcessCharacterCreationAsync(client);
+            var delayTask = Task.Delay(2000); // 2 seconds delay
+
+            var completedTask = await Task.WhenAny(processTask, delayTask);
+
+            if (completedTask == delayTask)
+            {
+                // If the delay task completes first, it means the character creation process is taking too long.
+                await Log.WriteLogAsync(LogLevel.Warning, "Character creation process exceeded 2 seconds.");
+                await client.SendAsync(RegisterTryAgain);
+                return; // Optionally disconnect the client or handle accordingly.
+            }
+
+            // If we reach here, it means the character creation process has completed within 2 seconds.
+            // No further action is required as the processTask has already handled everything.
+        }
+        public async Task ProcessCharacterCreationAsync(Client client)
         {
             await Log.WriteLogAsync(LogLevel.Info, $"Character creation request from {CharacterName}");
             // Validate that the player has access to character creation
@@ -129,7 +148,7 @@ namespace Comet.Game.Packets
                 return;
             }
             await Log.WriteLogAsync(LogLevel.Info, "Character creation input validated");
-            DbPointAllot allot = Kernel.RoleManager.GetPointAllot((ushort) (Class / 10), 1) ?? new DbPointAllot
+            DbPointAllot allot = Kernel.RoleManager.GetPointAllot((ushort)(Class / 10), 1) ?? new DbPointAllot
             {
                 Strength = 4,
                 Agility = 6,
@@ -143,7 +162,7 @@ namespace Comet.Game.Packets
                 AccountIdentity = client.Creation.AccountID,
                 Name = CharacterName,
                 Mate = 0,
-                Profession = (byte) Class,
+                Profession = (byte)Class,
                 Mesh = Mesh,
                 Silver = 1000,
                 Level = 1,
@@ -158,11 +177,11 @@ namespace Comet.Game.Packets
                 Vitality = allot.Vitality,
                 Spirit = allot.Spirit,
                 HealthPoints =
-                    (ushort) (allot.Strength * 3
+                    (ushort)(allot.Strength * 3
                               + allot.Agility * 3
                               + allot.Spirit * 3
                               + allot.Vitality * 24),
-                ManaPoints = (ushort) (allot.Spirit * 5),
+                ManaPoints = (ushort)(allot.Spirit * 5),
                 Registered = DateTime.Now,
                 ExperienceMultiplier = 5,
                 ExperienceExpires = DateTime.Now.AddHours(1),
@@ -171,7 +190,7 @@ namespace Comet.Game.Packets
             };
             await Log.WriteLogAsync(LogLevel.Info, "Character creation character validated");
             // Generate a random look for the character
-            BodyType body = (BodyType) Mesh;
+            BodyType body = (BodyType)Mesh;
             switch (body)
             {
                 case BodyType.AgileFemale:
@@ -183,7 +202,7 @@ namespace Comet.Game.Packets
                     break;
             }
 
-            character.Hairstyle = (ushort) (
+            character.Hairstyle = (ushort)(
                 await Kernel.NextAsync(3, 9) * 100 + Hairstyles[
                     await Kernel.NextAsync(0, Hairstyles.Length)]);
             await Log.WriteLogAsync(LogLevel.Info, "Character creation look validated");
@@ -205,8 +224,8 @@ namespace Comet.Game.Packets
             try
             {
                 await Log.WriteLogAsync(LogLevel.Info, "Character creation starting character creation");
-                await GenerateInitialEquipmentAsync(character);    
-                await Log.WriteLogAsync(LogLevel.Info, "Character creation generated initial equipment");            
+                await GenerateInitialEquipmentAsync(character);
+                await Log.WriteLogAsync(LogLevel.Info, "Character creation generated initial equipment");
             }
             catch (Exception e)
             {
@@ -294,13 +313,13 @@ namespace Comet.Game.Packets
             DbItem item = Item.CreateEntity(type);
             if (item == null)
                 return;
-            item.Position = (byte) position;
+            item.Position = (byte)position;
             item.PlayerId = idOwner;
             item.AddLife = enchant;
             item.ReduceDmg = reduceDmg;
             item.Magic3 = add;
-            item.Gem1 = (byte) gem1;
-            item.Gem2 = (byte) gem2;
+            item.Gem1 = (byte)gem1;
+            item.Gem2 = (byte)gem2;
             await BaseRepository.SaveAsync(item);
         }
 
