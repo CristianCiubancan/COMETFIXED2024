@@ -238,6 +238,8 @@ namespace Comet.Game.Packets
             }
             await Log.WriteLogAsync(LogLevel.Info, "[Character creation] delaying for 500 ms");
             await Task.Delay(500);
+            await Log.WriteLogAsync(LogLevel.Info, "[Character creation] delaying for 20000 ms FOR TEST REMOVE THIS");
+            await Task.Delay(20000);
             await Log.WriteLogAsync(LogLevel.Info, "[Character creation] Sending character creation confirmation");
             await client.SendAsync(RegisterOk);
 
@@ -249,6 +251,7 @@ namespace Comet.Game.Packets
             if (await Task.WhenAny(registerConfirmed.Task, timeout) == timeout)
             {
                 // Client likely stuck, disconnect them
+                await Log.WriteLogAsync(LogLevel.Info, "[Character creation] Client stuck, disconnecting");
                 client.Disconnect();
             }
         }
