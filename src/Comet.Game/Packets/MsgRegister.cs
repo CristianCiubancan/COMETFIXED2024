@@ -113,12 +113,12 @@ namespace Comet.Game.Packets
         }
         public async Task ProcessCharacterCreationAsync(Client client)
         {
-            await Log.WriteLogAsync(LogLevel.Info, $"Character creation request from {CharacterName}");
+            await Log.WriteLogAsync(LogLevel.Info, $"[Character creation] request from {CharacterName}");
             // Validate that the player has access to character creation
             if (client.Creation == null || Token != client.Creation.Token ||
                 !Kernel.Registration.Contains(Token))
             {
-                await Log.WriteLogAsync(LogLevel.Error, "Invalid token in character creation request");
+                await Log.WriteLogAsync(LogLevel.Error, "[Character creation] Invalid token in character creation request");
                 await client.SendAsync(RegisterInvalid);
                 client.Disconnect();
                 return;
@@ -127,14 +127,14 @@ namespace Comet.Game.Packets
             // Check character name availability
             if (await CharactersRepository.ExistsAsync(CharacterName))
             {
-                await Log.WriteLogAsync(LogLevel.Error, "Character name already taken");
+                await Log.WriteLogAsync(LogLevel.Error, "[Character creation] Character name already taken");
                 await client.SendAsync(RegisterNameTaken);
                 return;
             }
 
             if (!Kernel.IsValidName(CharacterName))
             {
-                await Log.WriteLogAsync(LogLevel.Error, "Invalid character name");
+                await Log.WriteLogAsync(LogLevel.Error, "[Character creation] Invalid character name");
                 await client.SendAsync(RegisterInvalid);
                 return;
             }
@@ -143,11 +143,11 @@ namespace Comet.Game.Packets
             if (!Enum.IsDefined(typeof(BodyType), Mesh) ||
                 !Enum.IsDefined(typeof(BaseClassType), Class))
             {
-                await Log.WriteLogAsync(LogLevel.Error, "Invalid character creation input");
+                await Log.WriteLogAsync(LogLevel.Error, "[Character creation] Invalid character creation input");
                 await client.SendAsync(RegisterInvalid);
                 return;
             }
-            await Log.WriteLogAsync(LogLevel.Info, "Character creation input validated");
+            await Log.WriteLogAsync(LogLevel.Info, "[Character creation] input validated");
             DbPointAllot allot = Kernel.RoleManager.GetPointAllot((ushort)(Class / 10), 1) ?? new DbPointAllot
             {
                 Strength = 4,
@@ -155,7 +155,7 @@ namespace Comet.Game.Packets
                 Vitality = 12,
                 Spirit = 0
             };
-            await Log.WriteLogAsync(LogLevel.Info, "Character creation point allot validated");
+            await Log.WriteLogAsync(LogLevel.Info, "[Character creation] point allot validated");
             // Create the character
             var character = new DbCharacter
             {
@@ -188,7 +188,7 @@ namespace Comet.Game.Packets
                 HeavenBlessing = DateTime.Now.AddDays(30),
                 AutoAllot = 1
             };
-            await Log.WriteLogAsync(LogLevel.Info, "Character creation character validated");
+            await Log.WriteLogAsync(LogLevel.Info, "[Character creation] character validated");
             // Generate a random look for the character
             BodyType body = (BodyType)Mesh;
             switch (body)
@@ -205,41 +205,52 @@ namespace Comet.Game.Packets
             character.Hairstyle = (ushort)(
                 await Kernel.NextAsync(3, 9) * 100 + Hairstyles[
                     await Kernel.NextAsync(0, Hairstyles.Length)]);
-            await Log.WriteLogAsync(LogLevel.Info, "Character creation look validated");
-            
-            await Log.WriteLogAsync(LogLevel.Info, "Character creation delaying for 500 ms");
+            await Log.WriteLogAsync(LogLevel.Info, "[Character creation] look validated");
+
+            await Log.WriteLogAsync(LogLevel.Info, "[Character creation] delaying for 500 ms");
             await Task.Delay(500);
-            
+
             try
             {
-                await Log.WriteLogAsync(LogLevel.Info, "Character creation starting db character creation");
+                await Log.WriteLogAsync(LogLevel.Info, "[Character creation] starting db character creation");
                 // Save the character and continue with login
                 await CharactersRepository.CreateAsync(character);
                 Kernel.Registration.Remove(client.Creation.Token);
-                await Log.WriteLogAsync(LogLevel.Info, "Character creation character created");
+                await Log.WriteLogAsync(LogLevel.Info, "[Character creation] character created");
             }
             catch
             {
-                await Log.WriteLogAsync(LogLevel.Error, "Character creation failed to create character");
+                await Log.WriteLogAsync(LogLevel.Error, "[Character creation] failed to create character");
                 await client.SendAsync(RegisterTryAgain);
                 return;
             }
-            await Log.WriteLogAsync(LogLevel.Info, "Character creation delaying for 500 ms");
+            await Log.WriteLogAsync(LogLevel.Info, "[Character creation] delaying for 500 ms");
             await Task.Delay(500);
             try
             {
-                await Log.WriteLogAsync(LogLevel.Info, "Character creation generating initial equipment");
+                await Log.WriteLogAsync(LogLevel.Info, "[Character creation] generating initial equipment");
                 await GenerateInitialEquipmentAsync(character);
-                await Log.WriteLogAsync(LogLevel.Info, "Character creation generated initial equipment");
+                await Log.WriteLogAsync(LogLevel.Info, "[Character creation] generated initial equipment");
             }
             catch (Exception e)
             {
-                await Log.WriteLogAsync(LogLevel.Exception, $"Exception thrown when generating initial status for user. Msg: {e.Message}");
+                await Log.WriteLogAsync(LogLevel.Exception, $"[Character creation] Exception thrown when generating initial status for user. Msg: {e.Message}");
             }
-            await Log.WriteLogAsync(LogLevel.Info, "Character creation delaying for 500 ms");
+            await Log.WriteLogAsync(LogLevel.Info, "[Character creation] delaying for 500 ms");
             await Task.Delay(500);
-            await Log.WriteLogAsync(LogLevel.Info, "Sending character creation confirmation");
+            await Log.WriteLogAsync(LogLevel.Info, "[Character creation] Sending character creation confirmation");
             await client.SendAsync(RegisterOk);
+
+            var registerConfirmed = new TaskCompletionSource<bool>();
+
+            var timeout = Task.Delay(10000); // 10 seconds
+
+            // Wait for client to confirm 
+            if (await Task.WhenAny(registerConfirmed.Task, timeout) == timeout)
+            {
+                // Client likely stuck, disconnect them
+                client.Disconnect();
+            }
         }
 
         private async Task GenerateInitialEquipmentAsync(DbCharacter user)
