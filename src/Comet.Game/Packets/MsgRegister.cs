@@ -151,9 +151,9 @@ namespace Comet.Game.Packets
                     isSuccess = await ProcessCharacterCreationAsync(client, character, db);
                     stopwatch.Stop();
 
-                    if (isSuccess && stopwatch.ElapsedMilliseconds < 7000)
+                    if (isSuccess && stopwatch.ElapsedMilliseconds < 10000)
                     {
-                        scope.Complete(); // Commit transaction if successful and under 7 seconds
+                        scope.Complete(); // Commit transaction if successful and under 10 seconds
                         await client.SendAsync(RegisterOk);
                         break; // Exit the loop if successful
                     }
@@ -161,7 +161,7 @@ namespace Comet.Game.Packets
                     {
                         // The transaction will be rolled back automatically due to the scope being disposed without completing
                         // Optionally log the timeout or failure before retrying
-                        await Log.WriteLogAsync(LogLevel.Warning, "Character creation process exceeded 7 seconds or failed. Retrying...");
+                        await Log.WriteLogAsync(LogLevel.Warning, "Character creation process exceeded 10 seconds or failed. Retrying...");
                         retryCount++;
                     }
                 }
@@ -179,7 +179,6 @@ namespace Comet.Game.Packets
         }
         public async Task<bool> ProcessCharacterCreationAsync(Client client, DbCharacter character, ServerDbContext db)
         {
-            await Task.Delay(20000);
             await Log.WriteLogAsync(LogLevel.Info, $"[Character creation] request from {CharacterName}");
             // Validate that the player has access to character creation
             if (client.Creation == null || Token != client.Creation.Token ||
@@ -263,6 +262,7 @@ namespace Comet.Game.Packets
             }
             await Log.WriteLogAsync(LogLevel.Info, "[Character creation] Sending character creation confirmation");
             // await client.SendAsync(RegisterOk);
+            await Task.Delay(20000);
             return true;
         }
 
