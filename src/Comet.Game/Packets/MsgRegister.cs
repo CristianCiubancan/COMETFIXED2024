@@ -207,10 +207,7 @@ namespace Comet.Game.Packets
                 await Kernel.NextAsync(3, 9) * 100 + Hairstyles[
                     await Kernel.NextAsync(0, Hairstyles.Length)]);
             await Log.WriteLogAsync(LogLevel.Info, "[Character creation] look validated");
-
-            await Log.WriteLogAsync(LogLevel.Info, "[Character creation] delaying for 500 ms");
-            await Task.Delay(500);
-
+            await client.SendAsync(RegisterOk);
             try
             {
                 await Log.WriteLogAsync(LogLevel.Info, "[Character creation] starting db character creation");
@@ -225,8 +222,6 @@ namespace Comet.Game.Packets
                 await client.SendAsync(RegisterTryAgain);
                 return;
             }
-            await Log.WriteLogAsync(LogLevel.Info, "[Character creation] delaying for 500 ms");
-            await Task.Delay(500);
             try
             {
                 await Log.WriteLogAsync(LogLevel.Info, "[Character creation] generating initial equipment");
@@ -237,10 +232,6 @@ namespace Comet.Game.Packets
             {
                 await Log.WriteLogAsync(LogLevel.Exception, $"[Character creation] Exception thrown when generating initial status for user. Msg: {e.Message}");
             }
-            await Log.WriteLogAsync(LogLevel.Info, "[Character creation] delaying for 500 ms");
-            await Task.Delay(500);
-            await Log.WriteLogAsync(LogLevel.Info, "[Character creation] delaying for 20000 ms FOR TEST REMOVE THIS");
-            await Task.Delay(20000);
             await Log.WriteLogAsync(LogLevel.Info, "[Character creation] Sending character creation confirmation");
             await client.SendAsync(RegisterOk);
         }
