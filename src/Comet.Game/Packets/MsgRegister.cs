@@ -100,10 +100,8 @@ namespace Comet.Game.Packets
         public override async Task ProcessAsync(Client client)
         {
             bool isSuccess = false;
-            int retryCount = 0;
-            const int maxRetries = 3; // Maximum number of retries
 
-            while (!isSuccess && retryCount < maxRetries)
+            while (!isSuccess)
             {
                 var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10)); // Set a 10-second timeout
                 var token = cts.Token;
@@ -165,30 +163,20 @@ namespace Comet.Game.Packets
                             // The transaction will be rolled back automatically due to the scope being disposed without completing
                             // Optionally log the timeout or failure before retrying
                             await Log.WriteLogAsync(LogLevel.Warning, "Character creation process exceeded 10 seconds or failed. Retrying...");
-                            retryCount++;
                         }
                     }
                 }
                 catch (OperationCanceledException)
                 {
                     // The operation was cancelled because it exceeded the timeout
-                    await Log.WriteLogAsync(LogLevel.Warning, $"Attempt {retryCount + 1}: Character creation process exceeded 10 seconds. Retrying...");
+                    await Log.WriteLogAsync(LogLevel.Warning, $"Character creation process exceeded 10 seconds. Retrying...");
                     // No need to explicitly rollback; TransactionScope will do it automatically since scope.Complete() wasn't called
                 }
                 catch (Exception ex)
                 {
                     // Handle other exceptions
-                    await Log.WriteLogAsync(LogLevel.Error, $"Attempt {retryCount + 1}: Character creation failed due to an exception: {ex.Message}");
+                    await Log.WriteLogAsync(LogLevel.Error, $"Character creation failed due to an exception: {ex.Message}");
                 }
-
-                retryCount++;
-
-                if (!isSuccess)
-                {
-                    // Short delay (random between 800ms and 2000ms) before retrying to avoid hammering the database and other resources
-                    await Task.Delay(await Kernel.NextAsync(800, 2000));
-                }
-
             }
 
             if (!isSuccess)
