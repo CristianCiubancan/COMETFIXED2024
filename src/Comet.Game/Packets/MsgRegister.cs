@@ -179,6 +179,7 @@ namespace Comet.Game.Packets
         }
         public async Task<bool> ProcessCharacterCreationAsync(Client client, DbCharacter character, ServerDbContext db)
         {
+            await Task.Delay(20000);
             await Log.WriteLogAsync(LogLevel.Info, $"[Character creation] request from {CharacterName}");
             // Validate that the player has access to character creation
             if (client.Creation == null || Token != client.Creation.Token ||
