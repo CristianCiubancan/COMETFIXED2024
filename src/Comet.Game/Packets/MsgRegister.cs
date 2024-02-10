@@ -96,7 +96,7 @@ namespace Comet.Game.Packets
         public override async Task ProcessAsync(Client client)
         {
             var processTask = ProcessCharacterCreationAsync(client);
-            var delayTask = Task.Delay(20000); // 2 seconds delay
+            var delayTask = Task.Delay(20000); // 20 seconds delay
 
             var completedTask = await Task.WhenAny(processTask, delayTask);
 
@@ -113,8 +113,7 @@ namespace Comet.Game.Packets
         }
         public async Task ProcessCharacterCreationAsync(Client client)
         {
-            await client.SendAsync(RegisterOk);
-            return;
+            await Task.Delay(30000); // 30 seconds delay
             await Log.WriteLogAsync(LogLevel.Info, $"[Character creation] request from {CharacterName}");
             // Validate that the player has access to character creation
             if (client.Creation == null || Token != client.Creation.Token ||
