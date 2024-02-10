@@ -103,10 +103,8 @@ namespace Comet.Game.Packets
             if (completedTask == delayTask)
             {
                 // If the delay task completes first, it means the character creation process is taking too long.
-                // await Log.WriteLogAsync(LogLevel.Warning, "Character creation process exceeded 20 seconds.");
-                await Log.WriteLogAsync(LogLevel.Info, "[Character creation] Client stuck for more than 20 seconds, disconnecting");
-                await client.SendAsync(RegisterTryAgain);
-                client.Disconnect();
+                await Log.WriteLogAsync(LogLevel.Warning, "Character creation process exceeded 20 seconds.");
+                await client.Socket.DisconnectAsync(false);
                 return; // Optionally disconnect the client or handle accordingly.
             }
 
