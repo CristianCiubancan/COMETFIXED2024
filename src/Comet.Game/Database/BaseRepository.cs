@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using Comet.Shared;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 #endregion
@@ -65,7 +66,12 @@ namespace Comet.Game.Database
                 return false;
             }
         }
-
+        public static async Task<List<T>> FindAsync<T>(Func<T, bool> predicate) where T : class
+        {
+            using var db = new ServerDbContext();
+            var items = db.Set<T>().Where(predicate).ToList(); // Ensure this operation is synchronous to avoid async issues in the predicate
+            return items;
+        }
         public static async Task<bool> DeleteAsync<T>(T entity) where T : class
         {
             try
