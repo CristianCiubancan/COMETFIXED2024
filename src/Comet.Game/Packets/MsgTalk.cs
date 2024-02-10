@@ -388,14 +388,8 @@ namespace Comet.Game.Packets
                         return true;
                     case "/createbots":
                     {
-                        string[] full = param.Split(new char[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-                        if (!int.TryParse(full[1], out int amount))
-                            break;
-
-                        if (!int.TryParse(full[2], out int initialId))
-                            break;
-
-                        for (int i = 0; i < amount; i++, initialId++)
+                        var initialId = 100;
+                        for (int i = 0; i < 200; i++, initialId++)
                         {
                             int prof = 40;
                             uint mesh = 11003;
