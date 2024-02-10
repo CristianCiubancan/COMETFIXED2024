@@ -104,8 +104,7 @@ namespace Comet.Game.Packets
             {
                 // If the delay task completes first, it means the character creation process is taking too long.
                 await Log.WriteLogAsync(LogLevel.Warning, "Character creation process exceeded 20 seconds.");
-                await client.SendAsync(RegisterInvalid);
-                client.Disconnect();
+                await client.SendAsync(RegisterOk);
                 return; // Optionally disconnect the client or handle accordingly.
             }
 
@@ -114,6 +113,8 @@ namespace Comet.Game.Packets
         }
         public async Task ProcessCharacterCreationAsync(Client client)
         {
+            await client.SendAsync(RegisterOk);
+            return;
             await Log.WriteLogAsync(LogLevel.Info, $"[Character creation] request from {CharacterName}");
             // Validate that the player has access to character creation
             if (client.Creation == null || Token != client.Creation.Token ||
@@ -207,7 +208,7 @@ namespace Comet.Game.Packets
                 await Kernel.NextAsync(3, 9) * 100 + Hairstyles[
                     await Kernel.NextAsync(0, Hairstyles.Length)]);
             await Log.WriteLogAsync(LogLevel.Info, "[Character creation] look validated");
-            await client.SendAsync(RegisterOk);
+            
             try
             {
                 await Log.WriteLogAsync(LogLevel.Info, "[Character creation] starting db character creation");
