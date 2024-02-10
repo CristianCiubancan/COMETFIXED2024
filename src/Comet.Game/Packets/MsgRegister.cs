@@ -112,7 +112,6 @@ namespace Comet.Game.Packets
                 {
                     using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                     {
-                        var stopwatch = Stopwatch.StartNew();
                         var db = new ServerDbContext(); // Ensure this is the correct way to instantiate your context
 
                         DbPointAllot allot = Kernel.RoleManager.GetPointAllot((ushort)(Class / 10), 1) ?? new DbPointAllot
@@ -155,13 +154,11 @@ namespace Comet.Game.Packets
                         };
 
                         isSuccess = await ProcessCharacterCreationAsync(client, character, db, token);
-                        stopwatch.Stop();
 
-                        if (isSuccess && stopwatch.ElapsedMilliseconds < 10000)
+                        if (isSuccess)
                         {
                             scope.Complete(); // Commit transaction if successful and under 10 seconds
                             await client.SendAsync(RegisterOk);
-                            break; // Exit the loop if successful
                         }
                         else
                         {
